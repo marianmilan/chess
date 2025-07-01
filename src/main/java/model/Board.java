@@ -76,7 +76,7 @@ public class Board {
         return board;
     }
 
-    public boolean isEmpty(Position position){
-        return board[position.getPosX()][position.getPosY()] == null;
+    public Figure getFigureOnSquare(Position position) {
+        return board[position.getPosY()][position.getPosY()];
     }
 }

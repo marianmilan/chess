@@ -1,13 +1,12 @@
 package model.figures;
 
+import model.Board;
 import model.Position;
 
 public abstract class Figure {
 
     private boolean white = false;
-    private boolean dead = false;
     private boolean moved = false;
-
     private Position position;
 
     public Figure(boolean white, Position position){
@@ -15,16 +14,8 @@ public abstract class Figure {
         this.position = position;
     }
 
-    public void killed(){
-        this.dead = true;
-    }
-
     public boolean isWhite() {
         return this.white;
-    }
-
-    public void moveTo(Position whereTo){
-        this.position = whereTo;
     }
 
     public Position getPosition(){
@@ -38,4 +29,7 @@ public abstract class Figure {
     public void setMoved(){
         this.moved = true;
     }
+
+    public abstract boolean isValidMove(Board board, Position whereTo);
+
 }

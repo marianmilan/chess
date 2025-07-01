@@ -9,12 +9,12 @@ public class Position {
         this.posY = posY;
     }
 
-    public int xPosDifference(Position whereTo){
-        return whereTo.posX - this.posX;
+    public int xAbsPosDifference(Position whereTo){
+        return Math.abs(whereTo.posX - this.posX);
     }
 
-    public int yPosDifference(Position whereTo){
-        return whereTo.posY - this.posY;
+    public int yAbsPosDifference(Position whereTo){
+        return Math.abs(whereTo.posY - this.posY);
     }
 
     public void setPosition(int posX, int posY){
