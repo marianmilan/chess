@@ -8,6 +8,7 @@ public class Pawn extends Figure {
         super(white, position);
     }
 
+    @Override
     public boolean isValidMove(Board board, Position whereTo){
         int direction = this.isWhite() ? -1 : 1;
 
