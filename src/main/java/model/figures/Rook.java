@@ -10,21 +10,7 @@ public class Rook extends Figure {
     }
 
     @Override
-    public boolean isValidMove(Board board, Position whereTo){
-        Position start = this.getPosition();
-
-        int rowDiff = start.yAbsPosDifference(whereTo);
-        int colDiff = start.xAbsPosDifference(whereTo);
-
-        int xDirection = start.getPosX() < whereTo.getPosX() ? 1 : -1;
-        int yDirection = start.getPosY() < whereTo.getPosY() ? 1 : -1;
-
-        // Check if the line is not straight
-        if(rowDiff != 0 && colDiff != 0){
-            return false;
-        }
-
-
-
+    public boolean isValidMove(Board board, Position whereTo) {
+        return SlidingMove.isStraightValid(board, this, whereTo);
     }
 }
