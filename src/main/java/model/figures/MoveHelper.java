@@ -3,14 +3,9 @@ package model.figures;
 import model.Board;
 import model.Position;
 
-public class SlidingMove {
+public class MoveHelper {
 
     public static boolean isDiagonalValid(Board board, Figure startPiece, Position targetSquare) {
-        // Move to the same square is not allowed
-        if (startPiece.getPosition() == targetSquare) {
-            return false;
-        }
-
         Position start = startPiece.getPosition();
 
         int rowDiff = start.yAbsPosDifference(targetSquare);
@@ -83,8 +78,19 @@ public class SlidingMove {
     }
 
     // return true if the target square is null or a piece that can be captured
-    private static boolean isValidTarget(Board board, Figure piece, Position targetSquare) {
+    public static boolean isValidTarget(Board board, Figure piece, Position targetSquare) {
         Figure target = board.getFigureOnSquare(targetSquare);
         return target == null || target.isWhite() != piece.isWhite();
     }
+
+    // return true if the move is withing board range and not the same start and end position
+    public static boolean isWithinBounds(Board board, Figure piece, Position targetSquare){
+        Position start = piece.getPosition();
+
+        int xPos = targetSquare.getPosX();
+        int yPos = targetSquare.getPosY();
+
+        return start.equals(targetSquare)  && xPos <= 7 && xPos >= 0 && yPos <= 7 && yPos >= 0;
+    }
 }
+
