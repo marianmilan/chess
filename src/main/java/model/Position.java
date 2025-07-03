@@ -29,4 +29,14 @@ public class Position {
     public int getPosY(){
         return posY;
     }
+
+    @Override
+    public boolean equals(Object obj){
+        if(this == obj) return true;
+        if(obj == null || obj.getClass() != getClass()) return false;
+
+        Position other = (Position) obj;
+
+        return this.getPosX() == other.getPosX() && this.getPosY() == other.getPosY();
+    }
 }
