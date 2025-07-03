@@ -10,7 +10,11 @@ public class Queen extends Figure {
     }
 
     @Override
-    public boolean isValidMove(Board board, Position whereTo) {
-
+    public boolean isValidMove(Board board, Position targetSquare) {
+        if(!MoveHelper.isWithinBounds(board, this, targetSquare)){
+            return false;
+        }
+        return MoveHelper.isStraightValid(board, this, targetSquare)
+            || MoveHelper.isDiagonalValid(board, this, targetSquare);
     }
 }

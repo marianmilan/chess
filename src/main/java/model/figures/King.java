@@ -9,9 +9,21 @@ public class King extends Figure {
         super(white, position);
     }
 
-
     @Override
-    public boolean isValidMove(Board board, Position whereTo) {
+    public boolean isValidMove(Board board, Position targetSquare) {
+        if (!MoveHelper.isWithinBounds(board, this, targetSquare)) {
+            return false;
+        }
 
+        Position start = this.getPosition();
+
+        int rowDiff = start.yAbsPosDifference(targetSquare);
+        int colDiff = start.xAbsPosDifference(targetSquare);
+
+        if(rowDiff > 1 || colDiff > 1 || (rowDiff == 0 && colDiff == 0)){
+            return false;
+        }
+
+        return MoveHelper.isValidTarget(board, this, targetSquare);
     }
 }

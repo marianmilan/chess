@@ -10,7 +10,12 @@ public class Bishop extends Figure {
     }
 
     @Override
-    public boolean isValidMove(Board board, Position whereTo) {
-        return SlidingMove.isDiagonalValid(board, this, whereTo);
+    public boolean isValidMove(Board board, Position targetSquare) {
+
+        if(!MoveHelper.isWithinBounds(board, this, targetSquare)){
+            return false;
+        }
+
+        return MoveHelper.isDiagonalValid(board, this, targetSquare);
     }
 }

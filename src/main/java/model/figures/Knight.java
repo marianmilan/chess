@@ -9,32 +9,18 @@ public class Knight extends Figure {
         super(white, position);
     }
 
-    public boolean isValidMove(Board board, Position whereTo) {
+    public boolean isValidMove(Board board, Position targetSquare) {
+        if(!MoveHelper.isWithinBounds(board, this, targetSquare)){
+            return false;
+        }
+
         Position start = this.getPosition();
 
-        int rowDiff = start.yAbsPosDifference(whereTo);
-        int colDiff = start.xAbsPosDifference(whereTo);
+        int rowDiff = start.yAbsPosDifference(targetSquare);
+        int colDiff = start.xAbsPosDifference(targetSquare);
 
-        int xPos = whereTo.getPosX();
-        int yPos = whereTo.getPosY();
+        boolean isLShapedMove= (rowDiff == 1 && colDiff == 2) || (rowDiff == 2 && colDiff ==1);
 
-        Figure endSquare = board.getFigureOnSquare(whereTo);
-
-        // Check if the move is within board range
-        if (xPos <= 7 && xPos >= 0 && yPos <= 7 && yPos >= 0) {
-
-            // Check 2 forward 1 to the side move
-            if ((endSquare == null || endSquare.isWhite() != this.isWhite())
-                    && rowDiff == 2 && colDiff == 1) {
-                return true;
-            }
-
-            // Check 1 forward 2 to the side move
-            if ((endSquare == null || endSquare.isWhite() != this.isWhite())
-                    && rowDiff == 1 && colDiff == 2) {
-                return true;
-            }
-        }
-        return false;
+        return MoveHelper.isValidTarget(board, this, targetSquare) && isLShapedMove;
     }
 }

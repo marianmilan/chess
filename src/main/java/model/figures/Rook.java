@@ -10,7 +10,12 @@ public class Rook extends Figure {
     }
 
     @Override
-    public boolean isValidMove(Board board, Position whereTo) {
-        return SlidingMove.isStraightValid(board, this, whereTo);
+    public boolean isValidMove(Board board, Position targetSquare) {
+
+        if(!MoveHelper.isWithinBounds(board, this, targetSquare)){
+            return false;
+        }
+
+        return MoveHelper.isStraightValid(board, this, targetSquare);
     }
 }
