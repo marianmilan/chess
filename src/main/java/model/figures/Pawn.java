@@ -2,7 +2,7 @@ package model.figures;
 
 import model.*;
 
-public class Pawn extends Figure {
+public class Pawn extends Piece {
 
     public Pawn(boolean white, Position position){
         super(white, position);
@@ -22,8 +22,8 @@ public class Pawn extends Figure {
         int rowDiff = start.yAbsPosDifference(targetSquare);
         int colDiff = start.xAbsPosDifference(targetSquare);
 
-        Figure middleSquare = board.getFigureOnSquare(middle);
-        Figure endSquare = board.getFigureOnSquare(targetSquare);
+        Piece middleSquare = board.getFigureOnSquare(middle);
+        Piece endSquare = board.getFigureOnSquare(targetSquare);
 
         // Check if one move forward is possible
         if(rowDiff == 1 && colDiff == 0 && endSquare == null){

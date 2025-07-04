@@ -3,13 +3,13 @@ package model.figures;
 import model.Board;
 import model.Position;
 
-public abstract class Figure {
+public abstract class Piece {
 
     private boolean white = false;
     private boolean moved = false;
     private Position position;
 
-    public Figure(boolean white, Position position){
+    public Piece(boolean white, Position position){
         this.white = white;
         this.position = position;
     }
@@ -28,6 +28,10 @@ public abstract class Figure {
 
     public void setMoved(){
         this.moved = true;
+    }
+
+    public void setPosition(Position targetSquare){
+        this.position = targetSquare;
     }
 
     public abstract boolean isValidMove(Board board, Position whereTo);

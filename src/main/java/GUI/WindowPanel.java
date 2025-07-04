@@ -8,7 +8,6 @@ public class WindowPanel extends JPanel {
 
     public WindowPanel(){
         setLayout(new GridBagLayout());
-
         setupChessBoard();
         setupPieces();
     }
@@ -78,6 +77,8 @@ public class WindowPanel extends JPanel {
         public Square(Color color) {
             setContentAreaFilled(false);
             setBorderPainted(false);
+            // change this after
+            setFocusPainted(true);
             setBackground(color);
             setOpaque(true);
         }

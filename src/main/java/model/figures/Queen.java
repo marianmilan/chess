@@ -3,7 +3,7 @@ package model.figures;
 import model.Board;
 import model.Position;
 
-public class Queen extends Figure {
+public class Queen extends Piece {
 
     public Queen(boolean white, Position position){
         super(white, position);
