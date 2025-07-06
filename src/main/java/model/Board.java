@@ -3,14 +3,13 @@ package model;
 import model.figures.*;
 
 public class Board {
-    private Piece[][] board;
+    private final Piece[][] board = new Piece[8][8];
 
     public Board(){
         setupBoard();
     }
 
     private void setupBoard(){
-        this.board = new Piece[8][8];
         placePawns();
         placeRooks();
         placeKnights();
@@ -77,7 +76,7 @@ public class Board {
     }
 
     public Piece getFigureOnSquare(Position position) {
-        return board[position.getPosY()][position.getPosY()];
+        return board[position.getPosY()][position.getPosX()];
     }
 
     public void movePiece(Piece piece, Position targetSquare){
