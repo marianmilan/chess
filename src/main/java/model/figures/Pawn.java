@@ -21,10 +21,10 @@ public class Pawn extends Piece {
         int direction = this.isWhite() ? -1 : 1;
 
         Position start = this.getPosition();
-        Position middle = new Position(start.getPosX() + direction, start.getPosY());
+        Position middle = new Position(start.getPosX(), start.getPosY() + direction);
 
-        int rowDiff = start.xAbsPosDifference(targetSquare);
-        int colDiff = start.yAbsPosDifference(targetSquare);
+        int rowDiff = start.yAbsPosDifference(targetSquare);
+        int colDiff = start.xAbsPosDifference(targetSquare);
 
         Piece middleSquare = board.getFigureOnSquare(middle);
         Piece endSquare = board.getFigureOnSquare(targetSquare);
@@ -41,7 +41,7 @@ public class Pawn extends Piece {
         }
 
         // Check if there is a piece that can be captured
-        if(rowDiff == 1 && colDiff == 1 && endSquare == null || endSquare.isWhite() != this.isWhite()){
+        if(rowDiff == 1 && colDiff == 1 && endSquare != null && (endSquare.isWhite() != this.isWhite())){
             return true;
         }
 
@@ -60,11 +60,11 @@ public class Pawn extends Piece {
         List<Position> moves = new ArrayList<>();
 
         // Add all moves pawn can make
-        moves.add(new Position(currentPosX + direction, currentPosY));
-        moves.add(new Position(currentPosX + direction, currentPosY + 1));
-        moves.add(new Position(currentPosX + direction, currentPosY - 1));
+        moves.add(new Position(currentPosX, currentPosY + direction));
+        moves.add(new Position(currentPosX + 1, currentPosY + direction));
+        moves.add(new Position(currentPosX - 1, currentPosY + direction));
         if(!this.haveMoved()){
-            moves.add(new Position(currentPosX + 2 * direction, currentPosY));
+            moves.add(new Position(currentPosX, currentPosY + 2 * direction));
         }
         // return list of possible moves selected pawn can make
         return moves.stream()
