@@ -23,7 +23,7 @@ public class King extends Piece {
         int rowDiff = start.yAbsPosDifference(targetSquare);
         int colDiff = start.xAbsPosDifference(targetSquare);
 
-        if(rowDiff > 1 || colDiff > 1 || (rowDiff == 0 && colDiff == 0)){
+        if(rowDiff > 1 || colDiff > 1){
             return false;
         }
 
