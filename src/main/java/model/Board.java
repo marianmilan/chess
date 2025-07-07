@@ -20,8 +20,8 @@ public class Board {
 
     private void placePawns(){
         for(int i = 0; i < 8; i++){
-            board[6][i] = new Pawn(true, new Position(6,i));
-            board[1][i] = new Pawn(false, new Position(1,i));
+            board[6][i] = new Pawn(true, new Position(6, i));
+            board[1][i] = new Pawn(false, new Position(1, i));
         }
     }
 
@@ -76,11 +76,21 @@ public class Board {
     }
 
     public Piece getFigureOnSquare(Position position) {
-        return board[position.getPosY()][position.getPosX()];
+        return board[position.getPosX()][position.getPosY()];
     }
 
     public void movePiece(Piece piece, Position targetSquare){
+        int targetPosX = targetSquare.getPosX();
+        int targetPosY = targetSquare.getPosY();
+
+        int currentPosX = piece.getPosition().getPosX();
+        int currentPosY = piece.getPosition().getPosY();
+
+        board[currentPosX][currentPosY] = null;
+        board[targetPosX][targetPosY] = piece;
+
         piece.setMoved();
         piece.setPosition(targetSquare);
+
     }
 }
