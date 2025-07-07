@@ -3,6 +3,16 @@ package model.figures;
 import model.Board;
 import model.Position;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.DoubleToIntFunction;
+
+
+/*
+ * This class is helper class to reuse code for diagonal and sliding pieces
+ * and to check if the move is within bounds of the board which all pieces use
+ */
+
 public class MoveHelper {
 
     public static boolean isDiagonalValid(Board board, Piece startPiece, Position targetSquare) {
@@ -90,7 +100,64 @@ public class MoveHelper {
         int xPos = targetSquare.getPosX();
         int yPos = targetSquare.getPosY();
 
-        return start.equals(targetSquare)  && xPos <= 7 && xPos >= 0 && yPos <= 7 && yPos >= 0;
+        return !start.equals(targetSquare) && xPos <= 7 && xPos >= 0 && yPos <= 7 && yPos >= 0;
+    }
+
+    public static void getDiagonalMoves(Board board, Piece piece, List<Position> moves, int numOfSquares){
+       int[][] diagonal = {
+               {-1, -1}, {-1, 1}, {1, -1}, {1, 1}
+       };
+
+       int currentPosX = piece.getPosition().getPosX();
+       int currentPosY = piece.getPosition().getPosY();
+
+       for (int[] dir : diagonal){
+           int dirX = dir[0];
+           int dirY = dir[1];
+
+           for(int i = 1; i <= numOfSquares; i++){
+               Position position = new Position(i * dirX + currentPosX, i * dirY + currentPosY);
+
+               if(!isWithinBounds(board, piece, position)){
+                   break;
+               }
+
+               if(!piece.isValidMove(board, position)){
+                   break;
+               }
+
+               System.out.println("diagonal" + " " + position.getPosX() + " "  + position.getPosY());
+               moves.add(position);
+           }
+       }
+    }
+
+    public static void getStraightMoves(Board board, Piece piece, List<Position> moves, int numOfSquares){
+        int[][] straight = {
+                {0, -1}, {0, 1}, {-1, 0}, {1, 0}
+        };
+
+        int currentPosX = piece.getPosition().getPosX();
+        int currentPosY = piece.getPosition().getPosY();
+
+        for (int[] dir : straight){
+            int dirX = dir[0];
+            int dirY = dir[1];
+
+            for(int i = 1; i <= numOfSquares; i++){
+                Position position = new Position(i * dirX + currentPosX, i * dirY + currentPosY);
+
+                if(!isWithinBounds(board, piece, position)){
+                    break;
+                }
+
+                if(!piece.isValidMove(board, position)){
+                    break;
+                }
+                System.out.println("rovne" + " " + position.getPosX() + " "  + position.getPosY());
+                moves.add(position);
+            }
+        }
     }
 }
 

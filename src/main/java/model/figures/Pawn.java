@@ -2,6 +2,10 @@ package model.figures;
 
 import model.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Pawn extends Piece {
 
     public Pawn(boolean white, Position position){
@@ -17,10 +21,10 @@ public class Pawn extends Piece {
         int direction = this.isWhite() ? -1 : 1;
 
         Position start = this.getPosition();
-        Position middle = new Position(start.getPosX(), start.getPosY() + direction);
+        Position middle = new Position(start.getPosX() + direction, start.getPosY());
 
-        int rowDiff = start.yAbsPosDifference(targetSquare);
-        int colDiff = start.xAbsPosDifference(targetSquare);
+        int rowDiff = start.xAbsPosDifference(targetSquare);
+        int colDiff = start.yAbsPosDifference(targetSquare);
 
         Piece middleSquare = board.getFigureOnSquare(middle);
         Piece endSquare = board.getFigureOnSquare(targetSquare);
@@ -37,10 +41,34 @@ public class Pawn extends Piece {
         }
 
         // Check if there is a piece that can be captured
-        if(rowDiff == 1 && colDiff == 1 && MoveHelper.isValidTarget(board, this, targetSquare)){
+        if(rowDiff == 1 && colDiff == 1 && endSquare == null || endSquare.isWhite() != this.isWhite()){
             return true;
         }
 
         return false;
+    }
+
+
+    // Return list of all possible moves by selected pawn
+    @Override
+    public List<Position> getPossibleMoves(Board board){
+        int direction = this.isWhite() ? -1 : 1;
+
+        int currentPosX = this.getPosition().getPosX();
+        int currentPosY = this.getPosition().getPosY();
+
+        List<Position> moves = new ArrayList<>();
+
+        // Add all moves pawn can make
+        moves.add(new Position(currentPosX + direction, currentPosY));
+        moves.add(new Position(currentPosX + direction, currentPosY + 1));
+        moves.add(new Position(currentPosX + direction, currentPosY - 1));
+        if(!this.haveMoved()){
+            moves.add(new Position(currentPosX + 2 * direction, currentPosY));
+        }
+        // return list of possible moves selected pawn can make
+        return moves.stream()
+                .filter(position -> this.isValidMove(board, position))
+                .collect(Collectors.toList());
     }
 }

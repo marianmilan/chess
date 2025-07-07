@@ -3,6 +3,10 @@ package model.figures;
 import model.Board;
 import model.Position;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Queen extends Piece {
 
     public Queen(boolean white, Position position){
@@ -16,5 +20,13 @@ public class Queen extends Piece {
         }
         return MoveHelper.isStraightValid(board, this, targetSquare)
             || MoveHelper.isDiagonalValid(board, this, targetSquare);
+    }
+
+    @Override
+    public List<Position> getPossibleMoves(Board board){
+        List<Position> moves = new ArrayList<>();
+        MoveHelper.getDiagonalMoves(board, this, moves, 8);
+        MoveHelper.getStraightMoves(board, this, moves, 8);
+        return moves;
     }
 }

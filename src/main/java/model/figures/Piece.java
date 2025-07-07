@@ -3,6 +3,8 @@ package model.figures;
 import model.Board;
 import model.Position;
 
+import java.util.List;
+
 public abstract class Piece {
 
     private boolean white = false;
@@ -35,5 +37,7 @@ public abstract class Piece {
     }
 
     public abstract boolean isValidMove(Board board, Position whereTo);
+
+    public abstract List<Position> getPossibleMoves(Board board);
 
 }
