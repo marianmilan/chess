@@ -6,12 +6,11 @@ import model.figures.Piece;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 public class WindowPanel extends JPanel {
     private final Square[][] squares = new Square[8][8];
+    private Square selectedSquare = null;
     private final PieceIconManager iconManager;
     private final GameManager manager;
 
@@ -33,7 +32,7 @@ public class WindowPanel extends JPanel {
                squares[i][j] = new Square(color, i, j);
                squares[i][j].addActionListener(event -> {
                    Square clicked = (Square) event.getSource();
-                   highlightSquares(clicked);
+                   requestMove(clicked);
                });
                add(squares[i][j], grid);
             }
@@ -48,21 +47,53 @@ public class WindowPanel extends JPanel {
                 Piece piece = manager.getBoard().getFigureOnSquare(new Position(i, j));
                 if (piece != null) {
                     iconManager.displayIcon(squares[i][j], piece);
+                } else {
+                    squares[i][j].setIcon(null);
                 }
             }
         }
     }
 
-    public void highlightSquares(Square square){
-        refreshBoard();
+    public void highlightMoves(Square square){
         Piece currentPiece = manager.getBoard().getFigureOnSquare(new Position(square.posX, square.posY));
 
-        if(currentPiece != null){
+        if(currentPiece != null && currentPiece.isWhite() == manager.isWhiteTurn()){
             List<Position> moves = currentPiece.getPossibleMoves(manager.getBoard());
-            moves.stream()
-                    .forEach(position -> {
-                        squares[position.getPosX()][position.getPosY()].setBackground(new Color(255, 165, 0, 150));
-                    });
+            moves.forEach(position ->{
+                squares[position.getPosX()][position.getPosY()].setBackground(new Color(223, 172, 97, 150));
+            });
+        }
+    }
+
+
+    public void requestMove(Square square){
+        refreshBoard();
+
+        // If the square was not selected before, select square and highlight possible moves
+        if(selectedSquare == null){
+            highlightMoves(square);
+            selectedSquare = square;
+        } else {
+            Piece target = manager.getBoard().getFigureOnSquare(new Position(square.posX, square.posY));
+            Piece start = manager.getBoard().getFigureOnSquare(new Position(selectedSquare.posX, selectedSquare.posY));
+
+            // If the target square is same color display new piece highlight moves
+            if (target != null && target.isWhite() == manager.isWhiteTurn()){
+                highlightMoves(square);
+                selectedSquare = square;
+            }
+
+            //
+            if(!start.isValidMove(manager.getBoard(), new Position(square.posX, square.posY)) || start.equals(target)){
+
+            }
+
+            // If the move is valid make move and refresh board
+            if(manager.makeMove(new Position(selectedSquare.posX, selectedSquare.posY), new Position(square.posX, square.posY))){
+                System.out.println("Biely: " + " " + manager.isWhiteTurn());
+                refreshBoard();
+            }
+            selectedSquare = null;
         }
     }
 
@@ -71,7 +102,7 @@ public class WindowPanel extends JPanel {
         private int posX;
         private int posY;
 
-        public Square(Color color, int posX, int posY) {
+        public Square(Color color, int posX, int posY){
             this.posX = posX;
             this.posY = posY;
 
