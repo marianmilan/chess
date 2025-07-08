@@ -1,12 +1,11 @@
-package GUI;
+package graphics;
 
-import Logic.GameManager;
-import model.Position;
-import model.figures.Piece;
-
-import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import javax.swing.*;
+import logic.GameManager;
+import model.Position;
+import model.figures.Piece;
 
 public class WindowPanel extends JPanel {
     private final Square[][] squares = new Square[8][8];
@@ -14,7 +13,8 @@ public class WindowPanel extends JPanel {
     private final PieceIconManager iconManager;
     private final GameManager manager;
 
-    public WindowPanel(){
+    public WindowPanel() {
+        setBackground(new Color(152, 118, 84));
         setLayout(new GridBagLayout());
         this.manager = new GameManager();
         this.iconManager = new PieceIconManager();
@@ -22,10 +22,10 @@ public class WindowPanel extends JPanel {
         refreshBoard();
     }
 
-    private void setupChessBoard(){
+    private void setupChessBoard() {
         GridBagConstraints grid = new GridBagConstraints();
-        for(int i = 0; i < 8; i++){
-            for(int j = 0; j < 8; j++){
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
                Color color = (i + j) % 2 == 0 ? Color.WHITE : Color.DARK_GRAY;
                grid.gridx = i;
                grid.gridy = j;
@@ -54,23 +54,23 @@ public class WindowPanel extends JPanel {
         }
     }
 
-    public void highlightMoves(Square square){
+    public void highlightMoves(Square square) {
         Piece currentPiece = manager.getBoard().getFigureOnSquare(new Position(square.posX, square.posY));
 
-        if(currentPiece != null && currentPiece.isWhite() == manager.isWhiteTurn()){
+        if(currentPiece != null && currentPiece.isWhite() == manager.isWhiteTurn()) {
             List<Position> moves = currentPiece.getPossibleMoves(manager.getBoard());
-            moves.forEach(position ->{
-                squares[position.getPosX()][position.getPosY()].setBackground(new Color(223, 172, 97, 150));
+            moves.forEach(position -> {
+                squares[position.getPosX()][position.getPosY()].setIcon(new ImageIcon("src/main/resources/mark.png"));
             });
         }
     }
 
 
-    public void requestMove(Square square){
+    public void requestMove(Square square) {
         refreshBoard();
 
         // If the square was not selected before, select square and highlight possible moves
-        if(selectedSquare == null){
+        if(selectedSquare == null) {
             highlightMoves(square);
             selectedSquare = square;
         } else {
@@ -78,22 +78,17 @@ public class WindowPanel extends JPanel {
             Piece start = manager.getBoard().getFigureOnSquare(new Position(selectedSquare.posX, selectedSquare.posY));
 
             // If the target square is same color display new piece highlight moves
-            if (target != null && target.isWhite() == manager.isWhiteTurn()){
+            if (target != null && target.isWhite() == manager.isWhiteTurn()) {
                 highlightMoves(square);
                 selectedSquare = square;
             }
 
-            //
-            if(!start.isValidMove(manager.getBoard(), new Position(square.posX, square.posY)) || start.equals(target)){
-
-            }
-
             // If the move is valid make move and refresh board
-            if(manager.makeMove(new Position(selectedSquare.posX, selectedSquare.posY), new Position(square.posX, square.posY))){
+            if(manager.makeMove(new Position(selectedSquare.posX, selectedSquare.posY), new Position(square.posX, square.posY))) {
                 System.out.println("Biely: " + " " + manager.isWhiteTurn());
                 refreshBoard();
+                selectedSquare = null;
             }
-            selectedSquare = null;
         }
     }
 
@@ -102,7 +97,7 @@ public class WindowPanel extends JPanel {
         private int posX;
         private int posY;
 
-        public Square(Color color, int posX, int posY){
+        public Square(Color color, int posX, int posY) {
             this.posX = posX;
             this.posY = posY;
 
@@ -115,7 +110,7 @@ public class WindowPanel extends JPanel {
         }
 
         @Override
-        public Dimension getPreferredSize(){
+        public Dimension getPreferredSize() {
             return new Dimension(80,80);
         }
 
