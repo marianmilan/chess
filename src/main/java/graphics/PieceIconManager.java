@@ -1,4 +1,4 @@
-package GUI;
+package graphics;
 
 import model.figures.Piece;
 import javax.swing.*;

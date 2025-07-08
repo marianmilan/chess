@@ -91,6 +91,5 @@ public class Board {
 
         piece.setMoved();
         piece.setPosition(targetSquare);
-
     }
 }
