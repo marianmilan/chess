@@ -1,4 +1,4 @@
-package Logic;
+package logic;
 
 import model.Board;
 import model.Position;
