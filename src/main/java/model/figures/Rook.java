@@ -26,6 +26,11 @@ public class Rook extends Piece {
     public List<Position> getPossibleMoves(Board board){
         List<Position> moves = new ArrayList<>();
         MoveHelper.getStraightMoves(board, this, moves, 8);
-        return moves;
+        return MoveHelper.filterMoves(board, this, moves);
+    }
+
+    @Override
+    public PieceType getPieceType(){
+        return PieceType.ROOK;
     }
 }

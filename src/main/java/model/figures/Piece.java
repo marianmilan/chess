@@ -40,4 +40,6 @@ public abstract class Piece {
 
     public abstract List<Position> getPossibleMoves(Board board);
 
+    public abstract PieceType getPieceType();
+
 }

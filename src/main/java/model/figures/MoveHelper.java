@@ -3,9 +3,8 @@ package model.figures;
 import model.Board;
 import model.Position;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.DoubleToIntFunction;
+import java.util.stream.Collectors;
 
 
 /*
@@ -126,7 +125,6 @@ public class MoveHelper {
                    break;
                }
 
-               System.out.println("diagonal" + " " + position.getPosX() + " "  + position.getPosY());
                moves.add(position);
            }
        }
@@ -154,10 +152,17 @@ public class MoveHelper {
                 if(!piece.isValidMove(board, position)){
                     break;
                 }
-                System.out.println("rovne" + " " + position.getPosX() + " "  + position.getPosY());
                 moves.add(position);
             }
         }
+    }
+
+    // helper method to filter valid moves and moves that will prevent or will not lead to check
+    public static List<Position> filterMoves(Board board, Piece piece, List<Position> moves){
+        return moves.stream()
+                .filter(position -> piece.isValidMove(board, position))
+                .filter(position -> !board.checkAfterMove(piece.getPosition(), position))
+                .collect(Collectors.toList());
     }
 }
 

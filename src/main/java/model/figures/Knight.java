@@ -44,8 +44,11 @@ public class Knight extends Piece {
         moves.add(new Position(currentPosX + 2, currentPosY - 1));
         moves.add(new Position(currentPosX + 2, currentPosY + 1));
 
-        return moves.stream()
-                .filter(position -> this.isValidMove(board, position))
-                .collect(Collectors.toList());
+        return MoveHelper.filterMoves(board, this, moves);
+    }
+
+    @Override
+    public PieceType getPieceType(){
+        return PieceType.KNIGHT;
     }
 }

@@ -35,6 +35,11 @@ public class King extends Piece {
         List<Position> moves = new ArrayList<>();
         MoveHelper.getDiagonalMoves(board, this, moves, 1);
         MoveHelper.getStraightMoves(board, this, moves, 1);
-        return moves;
+        return MoveHelper.filterMoves(board, this, moves);
+    }
+    @Override
+    public PieceType getPieceType(){
+        return PieceType.KING;
     }
 }
+

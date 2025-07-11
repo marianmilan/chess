@@ -41,7 +41,8 @@ public class Pawn extends Piece {
         }
 
         // Check if there is a piece that can be captured
-        if(rowDiff == 1 && colDiff == 1 && endSquare != null && (endSquare.isWhite() != this.isWhite())){
+        if(colDiff == 1 && endSquare != null && (endSquare.isWhite() != this.isWhite())
+            && endSquare.getPosition().getPosY() == this.getPosition().getPosY() + direction){
             return true;
         }
 
@@ -67,8 +68,11 @@ public class Pawn extends Piece {
             moves.add(new Position(currentPosX, currentPosY + 2 * direction));
         }
         // return list of possible moves selected pawn can make
-        return moves.stream()
-                .filter(position -> this.isValidMove(board, position))
-                .collect(Collectors.toList());
+        return MoveHelper.filterMoves(board, this, moves);
+    }
+
+    @Override
+    public PieceType getPieceType(){
+        return PieceType.PAWN;
     }
 }

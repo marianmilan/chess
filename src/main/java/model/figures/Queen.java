@@ -6,6 +6,7 @@ import model.Position;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Queen extends Piece {
 
@@ -27,6 +28,11 @@ public class Queen extends Piece {
         List<Position> moves = new ArrayList<>();
         MoveHelper.getDiagonalMoves(board, this, moves, 8);
         MoveHelper.getStraightMoves(board, this, moves, 8);
-        return moves;
+        return MoveHelper.filterMoves(board, this, moves);
+    }
+
+    @Override
+    public PieceType getPieceType(){
+        return PieceType.QUEEN;
     }
 }
