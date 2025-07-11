@@ -1,4 +1,10 @@
+package logic;
+
 import model.Board;
+import model.MoveResult;
+import model.Position;
+import model.figures.Piece;
+import model.figures.PieceType;
 
 public class GameManager {
     private Board board;
@@ -10,7 +16,22 @@ public class GameManager {
     }
 
 
-   
+    public MoveResult makeMove(Position start, Position targetSquare){
+        MoveResult result = board.movePiece(start, targetSquare, whiteTurn);
+        if(result == MoveResult.VALID){
+            whiteTurn = !whiteTurn;
+            if(board.checkMate(whiteTurn)){
+                return MoveResult.CHECK_MATE;
+            }
+        }
+
+        return result;
+    }
+
+    public void makePromotion(PieceType type, int posX, int posY){
+        board.promotion(type, whiteTurn, posX, posY);
+        whiteTurn = !whiteTurn;
+    }
 
     public boolean isWhiteTurn(){
         return  whiteTurn;
