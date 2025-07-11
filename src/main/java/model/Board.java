@@ -79,17 +79,102 @@ public class Board {
         return board[position.getPosX()][position.getPosY()];
     }
 
-    public void movePiece(Piece piece, Position targetSquare){
-        int targetPosX = targetSquare.getPosX();
-        int targetPosY = targetSquare.getPosY();
+    public MoveResult movePiece(Position start, Position targetSquare, boolean whiteTurn){
+        Piece piece = getFigureOnSquare(start);
 
-        int currentPosX = piece.getPosition().getPosX();
-        int currentPosY = piece.getPosition().getPosY();
+        if(piece == null || piece.isWhite() != whiteTurn || !piece.isValidMove(this, targetSquare)){
+            return MoveResult.INVALID;
+        }
 
-        board[currentPosX][currentPosY] = null;
-        board[targetPosX][targetPosY] = piece;
+        if(!checkAfterMove(start, targetSquare)){
+            board[start.getPosX()][start.getPosY()] = null;
+            board[targetSquare.getPosX()][targetSquare.getPosY()] = piece;
 
-        piece.setMoved();
+            piece.setPosition(targetSquare);
+            piece.setMoved();
+
+            if(piece.getPieceType() == PieceType.PAWN){
+                boolean needPromotion = piece.isWhite() ? piece.getPosition().getPosY() == 0 : piece.getPosition().getPosY() == 7;
+                if(needPromotion){
+                    return MoveResult.PROMOTION;
+                }
+                return MoveResult.VALID;
+            }
+
+            return MoveResult.VALID;
+        }
+        return MoveResult.INVALID;
+    }
+
+    public boolean checkAfterMove(Position start, Position targetSquare){
+        Piece piece = getFigureOnSquare(start);
+        Piece capturedPiece = getFigureOnSquare(targetSquare);
+
+        board[start.getPosX()][start.getPosY()] = null;
+        board[targetSquare.getPosX()][targetSquare.getPosY()] = piece;
         piece.setPosition(targetSquare);
+
+        boolean isInCheck = kingInCheck(piece.isWhite());
+
+        board[start.getPosX()][start.getPosY()] = piece;
+        board[targetSquare.getPosX()][targetSquare.getPosY()] = capturedPiece;
+        piece.setPosition(start);
+
+        return isInCheck;
+    }
+
+    public Position findKingPosition(boolean isWhite){
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++) {
+                Piece piece = getFigureOnSquare(new Position(i, j));
+                if(piece != null && piece.getPieceType() == PieceType.KING && piece.isWhite() == isWhite){
+                    return new Position(i, j);
+                }
+            }
+        }
+        throw new RuntimeException("King not found which should never happen.");
+    }
+
+    public boolean kingInCheck(boolean isWhite){
+        Position kingPosition = findKingPosition(isWhite);
+
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                Piece piece = getFigureOnSquare(new Position(i, j));
+                if(piece != null && piece.isWhite() != isWhite && piece.isValidMove(this, kingPosition)) {
+                    return true;
+                }
+            }
+        }
+       return false;
+    }
+
+    public boolean checkMate(boolean isWhite){
+        if(!kingInCheck(isWhite)){
+            return false;
+        }
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece piece = getFigureOnSquare(new Position(i, j));
+                if(piece != null && piece.isWhite() == isWhite && !piece.getPossibleMoves(this).isEmpty()){
+                    return false;
+                }
+            }
+        }
+       return true;
+    }
+
+    public void promotion(PieceType type, boolean white, int posX, int posY){
+        Piece newPiece;
+        Position position = new Position(posX, posY);
+        switch (type){
+            case QUEEN -> newPiece = new Queen(white, position);
+            case BISHOP -> newPiece = new Bishop(white, position);
+            case KNIGHT -> newPiece = new Knight(white, position);
+            case ROOK -> newPiece = new Rook(white, position);
+            default -> newPiece = null;
+        }
+        board[posX][posY] = newPiece;
     }
 }
