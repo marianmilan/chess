@@ -3,9 +3,12 @@ package graphics;
 import java.awt.*;
 import java.util.List;
 import javax.swing.*;
+
 import logic.GameManager;
+import model.MoveResult;
 import model.Position;
 import model.figures.Piece;
+import model.figures.PieceType;
 
 public class WindowPanel extends JPanel {
     private final Square[][] squares = new Square[8][8];
@@ -60,11 +63,37 @@ public class WindowPanel extends JPanel {
         if(currentPiece != null && currentPiece.isWhite() == manager.isWhiteTurn()) {
             List<Position> moves = currentPiece.getPossibleMoves(manager.getBoard());
             moves.forEach(position -> {
-                squares[position.getPosX()][position.getPosY()].setIcon(new ImageIcon("src/main/resources/mark.png"));
+                /*
+                 * display valid moves for a piece, if the square is empty (icon == null) add icon of a green circle
+                 *  else if the square has a piece that can be captured highlight the background of the square
+                 */
+                if(squares[position.getPosX()][position.getPosY()].getIcon() == null){
+                    squares[position.getPosX()][position.getPosY()].setIcon(new ImageIcon("src/main/resources/mark.png"));
+                } else {
+                    squares[position.getPosX()][position.getPosY()].setBackground(new Color(109, 153, 99, 100));
+                }
             });
         }
     }
 
+    public void requestPromotion(Square square){
+        Object[] options = {
+                PieceType.QUEEN,
+                PieceType.KNIGHT,
+                PieceType.BISHOP,
+                PieceType.ROOK
+        };
+        int n = JOptionPane.showOptionDialog(this, " ",
+                "Promotion", JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        manager.makePromotion((PieceType) options[n], square.posX, square.posY);
+        refreshBoard();
+    }
+
+    public void endingScreen(){
+        String message = manager.isWhiteTurn() ? "Vyhral cierny" : "Vyhral biely";
+        JOptionPane.showMessageDialog(this, message);
+    }
 
     public void requestMove(Square square) {
         refreshBoard();
@@ -75,7 +104,6 @@ public class WindowPanel extends JPanel {
             selectedSquare = square;
         } else {
             Piece target = manager.getBoard().getFigureOnSquare(new Position(square.posX, square.posY));
-            Piece start = manager.getBoard().getFigureOnSquare(new Position(selectedSquare.posX, selectedSquare.posY));
 
             // If the target square is same color display new piece highlight moves
             if (target != null && target.isWhite() == manager.isWhiteTurn()) {
@@ -84,18 +112,29 @@ public class WindowPanel extends JPanel {
             }
 
             // If the move is valid make move and refresh board
-            if(manager.makeMove(new Position(selectedSquare.posX, selectedSquare.posY), new Position(square.posX, square.posY))) {
-                System.out.println("Biely: " + " " + manager.isWhiteTurn());
-                refreshBoard();
-                selectedSquare = null;
+            MoveResult result = manager.makeMove(new Position(selectedSquare.posX, selectedSquare.posY), new Position(square.posX, square.posY));
+            switch (result){
+                case VALID -> {
+                    selectedSquare = null;
+                    refreshBoard();
+                }
+                case PROMOTION -> {
+                    selectedSquare = null;
+                    refreshBoard();
+                    requestPromotion(square);
+                }
+                case CHECK_MATE -> {
+                    refreshBoard();
+                    endingScreen();
+                }
             }
         }
     }
 
     // Helper class for chess square
     public static class Square extends JButton {
-        private int posX;
-        private int posY;
+        private final int posX;
+        private final int posY;
 
         public Square(Color color, int posX, int posY) {
             this.posX = posX;
