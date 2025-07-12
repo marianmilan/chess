@@ -27,7 +27,7 @@ public class PieceIconManager {
 
     public void displayIcon(WindowPanel.Square button, Piece piece){
         String color = piece.isWhite() ? "white" : "black";
-        String iconName = color + "_" + piece.getClass().getSimpleName().toLowerCase();
+        String iconName = color + "_" + piece.getPieceType().toString().toLowerCase();
         button.setIcon(icons.get(iconName));
     }
 }
