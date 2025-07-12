@@ -2,8 +2,6 @@ package model;
 
 import model.figures.*;
 
-import java.util.List;
-
 public class Board {
     private final Piece[][] board = new Piece[8][8];
 
@@ -88,41 +86,41 @@ public class Board {
             return MoveResult.INVALID;
         }
 
-        if (PieceType.KING == piece.getPieceType() && MoveResult.CASTLE_KINGSIDE == piece.isValidMove(this, targetSquare)) {
-            int posY = piece.getPosition().getPosY();
-            Piece rook = getFigureOnSquare(new Position(7, posY));
-
-            rook.setPosition(new Position(5, posY));
-            rook.setMoved();
-
-            piece.setPosition(new Position(6, posY));
-            piece.setMoved();
-            board[start.getPosX()][posY] = null;
-            board[7][posY] = null;
-            board[5][posY] = rook;
-            board[6][posY] = piece;
-
-            return MoveResult.VALID;
-        }
-
-        if (PieceType.KING == piece.getPieceType() && MoveResult.CASTLE_QUEENSIDE == piece.isValidMove(this, targetSquare)) {
-            int posY = piece.getPosition().getPosY();
-            Piece rook = getFigureOnSquare(new Position(0, posY));
-
-            rook.setPosition(new Position(3, posY));
-            rook.setMoved();
-
-            piece.setPosition(new Position(2, posY));
-            piece.setMoved();
-
-            board[start.getPosX()][posY] = null;
-            board[0][posY] = null;
-            board[3][posY] = rook;
-            board[2][posY] = piece;
-            return MoveResult.VALID;
-        }
-
         if(!checkAfterMove(start, targetSquare)){
+            if (PieceType.KING == piece.getPieceType() && MoveResult.CASTLE_KINGSIDE == piece.isValidMove(this, targetSquare)) {
+                int posY = piece.getPosition().getPosY();
+                Piece rook = getFigureOnSquare(new Position(7, posY));
+
+                rook.setPosition(new Position(5, posY));
+                rook.setMoved();
+
+                piece.setPosition(new Position(6, posY));
+                piece.setMoved();
+                board[start.getPosX()][posY] = null;
+                board[7][posY] = null;
+                board[5][posY] = rook;
+                board[6][posY] = piece;
+
+                return MoveResult.VALID;
+            }
+
+            if (PieceType.KING == piece.getPieceType() && MoveResult.CASTLE_QUEENSIDE == piece.isValidMove(this, targetSquare)) {
+                int posY = piece.getPosition().getPosY();
+                Piece rook = getFigureOnSquare(new Position(0, posY));
+
+                rook.setPosition(new Position(3, posY));
+                rook.setMoved();
+
+                piece.setPosition(new Position(2, posY));
+                piece.setMoved();
+
+                board[start.getPosX()][posY] = null;
+                board[0][posY] = null;
+                board[3][posY] = rook;
+                board[2][posY] = piece;
+                return MoveResult.VALID;
+            }
+
             board[start.getPosX()][start.getPosY()] = null;
             board[targetSquare.getPosX()][targetSquare.getPosY()] = piece;
 
@@ -177,7 +175,6 @@ public class Board {
             for (int j = 0; j < 8; j++){
                 Piece piece = getFigureOnSquare(new Position(i, j));
                 if(piece != null && piece.isWhite() != isWhite && MoveResult.VALID == piece.isValidMove(this, kingPosition)) {
-                    System.out.println(piece.getPieceType() + " " + piece.isWhite());
                     return true;
                 }
             }
