@@ -188,7 +188,7 @@ public class MoveHelper {
             return MoveResult.INVALID;
         }
 
-        if(rook.haveMoved() || rook.isWhite() != piece.isWhite() || rook.getPieceType() != PieceType.ROOK){
+        if(rook == null || rook.haveMoved() || rook.isWhite() != piece.isWhite() || rook.getPieceType() != PieceType.ROOK){
             return MoveResult.INVALID;
         }
 
@@ -210,7 +210,7 @@ public class MoveHelper {
             return MoveResult.INVALID;
         }
 
-        if(rook.haveMoved() || rook.isWhite() != piece.isWhite() || rook.getPieceType() != PieceType.ROOK){
+        if(rook == null || rook.haveMoved() || rook.isWhite() != piece.isWhite() || rook.getPieceType() != PieceType.ROOK){
             return MoveResult.INVALID;
         }
 

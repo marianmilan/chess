@@ -46,11 +46,12 @@ public class King extends Piece {
     @Override
     public List<Position> getPossibleMoves(Board board){
         List<Position> moves = new ArrayList<>();
+
         MoveHelper.getDiagonalMoves(board, this, moves, 1);
         MoveHelper.getStraightMoves(board, this, moves, 1);
-        MoveHelper.filterMoves(board, this, moves);
         MoveHelper.getCastlingMoves(board, this, moves);
-        return moves;
+
+        return MoveHelper.filterMoves(board, this, moves);
     }
     @Override
     public PieceType getPieceType(){
