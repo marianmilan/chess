@@ -1,6 +1,7 @@
 package model.figures;
 
 import model.Board;
+import model.MoveResult;
 import model.Position;
 
 import java.util.ArrayList;
@@ -13,10 +14,10 @@ public class Rook extends Piece {
     }
 
     @Override
-    public boolean isValidMove(Board board, Position targetSquare) {
+    public MoveResult isValidMove(Board board, Position targetSquare) {
 
-        if(!MoveHelper.isWithinBounds(board, this, targetSquare)){
-            return false;
+        if(MoveResult.INVALID == MoveHelper.isWithinBounds(board, this, targetSquare)){
+            return MoveResult.INVALID;
         }
 
         return MoveHelper.isStraightValid(board, this, targetSquare);

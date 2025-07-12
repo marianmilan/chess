@@ -1,6 +1,7 @@
 package model.figures;
 
 import model.Board;
+import model.MoveResult;
 import model.Position;
 
 import java.util.ArrayList;
@@ -13,9 +14,9 @@ public class Knight extends Piece {
         super(white, position);
     }
 
-    public boolean isValidMove(Board board, Position targetSquare) {
-        if(!MoveHelper.isWithinBounds(board, this, targetSquare)){
-            return false;
+    public MoveResult isValidMove(Board board, Position targetSquare) {
+        if(MoveResult.INVALID == MoveHelper.isWithinBounds(board, this, targetSquare)){
+            return MoveResult.INVALID;
         }
 
         Position start = this.getPosition();
@@ -25,7 +26,10 @@ public class Knight extends Piece {
 
         boolean isLShapedMove= (rowDiff == 1 && colDiff == 2) || (rowDiff == 2 && colDiff ==1);
 
-        return MoveHelper.isValidTarget(board, this, targetSquare) && isLShapedMove;
+        if(MoveResult.VALID == MoveHelper.isValidTarget(board, this, targetSquare) && isLShapedMove){
+            return MoveResult.VALID;
+        }
+        return MoveResult.INVALID;
     }
 
     @Override

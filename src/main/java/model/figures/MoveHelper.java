@@ -1,6 +1,7 @@
 package model.figures;
 
 import model.Board;
+import model.MoveResult;
 import model.Position;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class MoveHelper {
 
-    public static boolean isDiagonalValid(Board board, Piece startPiece, Position targetSquare) {
+    public static MoveResult isDiagonalValid(Board board, Piece startPiece, Position targetSquare) {
         Position start = startPiece.getPosition();
 
         int rowDiff = start.yAbsPosDifference(targetSquare);
@@ -26,7 +27,7 @@ public class MoveHelper {
 
         // Not a diagonal move - return
         if (rowDiff != colDiff) {
-            return false;
+            return MoveResult.INVALID;
         }
 
         int thisRow = start.getPosY();
@@ -38,14 +39,14 @@ public class MoveHelper {
             int yCor = thisRow + i * rowDirection;
 
             if (board.getFigureOnSquare(new Position(xCor, yCor)) != null) {
-                return false;
+                return MoveResult.INVALID;
             }
         }
 
         return isValidTarget(board, startPiece, targetSquare);
     }
 
-    public static boolean isStraightValid(Board board, Piece startPiece, Position targetSquare) {
+    public static MoveResult isStraightValid(Board board, Piece startPiece, Position targetSquare) {
         Position start = startPiece.getPosition();
 
         int colDiff = start.xAbsPosDifference(targetSquare);
@@ -56,7 +57,7 @@ public class MoveHelper {
 
         // one value must be 0 to be a valid straight move
         if (rowDiff != 0 && colDiff != 0) {
-            return false;
+            return MoveResult.INVALID;
         }
 
 
@@ -67,7 +68,7 @@ public class MoveHelper {
             for (int i = 1; i < rowDiff; i++) {
                 int yCor = start.getPosY() + i * rowDirection;
                 if (board.getFigureOnSquare(new Position(start.getPosX(), yCor)) != null) {
-                    return false;
+                    return MoveResult.INVALID;
                 }
             }
             return isValidTarget(board, startPiece, targetSquare);
@@ -78,28 +79,34 @@ public class MoveHelper {
             for (int i = 1; i < colDiff; i++) {
                 int xCor = start.getPosX() + i * colDirection;
                 if (board.getFigureOnSquare(new Position(xCor, start.getPosY())) != null) {
-                    return false;
+                    return MoveResult.INVALID;
                 }
             }
             return isValidTarget(board, startPiece, targetSquare);
         }
-        return false;
+        return MoveResult.INVALID;
     }
 
     // return true if the target square is null or a piece that can be captured
-    public static boolean isValidTarget(Board board, Piece piece, Position targetSquare) {
+    public static MoveResult isValidTarget(Board board, Piece piece, Position targetSquare) {
         Piece target = board.getFigureOnSquare(targetSquare);
-        return target == null || target.isWhite() != piece.isWhite();
+        if(target == null || target.isWhite() != piece.isWhite()){
+            return MoveResult.VALID;
+        }
+        return MoveResult.INVALID;
     }
 
     // return true if the move is withing board range and not the same start and end position
-    public static boolean isWithinBounds(Board board, Piece piece, Position targetSquare){
+    public static MoveResult isWithinBounds(Board board, Piece piece, Position targetSquare){
         Position start = piece.getPosition();
 
         int xPos = targetSquare.getPosX();
         int yPos = targetSquare.getPosY();
 
-        return !start.equals(targetSquare) && xPos <= 7 && xPos >= 0 && yPos <= 7 && yPos >= 0;
+        if(!start.equals(targetSquare) && xPos <= 7 && xPos >= 0 && yPos <= 7 && yPos >= 0) {
+            return  MoveResult.VALID;
+        }
+        return MoveResult.INVALID;
     }
 
     public static void getDiagonalMoves(Board board, Piece piece, List<Position> moves, int numOfSquares){
@@ -117,11 +124,11 @@ public class MoveHelper {
            for(int i = 1; i <= numOfSquares; i++){
                Position position = new Position(i * dirX + currentPosX, i * dirY + currentPosY);
 
-               if(!isWithinBounds(board, piece, position)){
+               if(MoveResult.INVALID == isWithinBounds(board, piece, position)){
                    break;
                }
 
-               if(!piece.isValidMove(board, position)){
+               if(MoveResult.INVALID == piece.isValidMove(board, position)){
                    break;
                }
 
@@ -145,11 +152,11 @@ public class MoveHelper {
             for(int i = 1; i <= numOfSquares; i++){
                 Position position = new Position(i * dirX + currentPosX, i * dirY + currentPosY);
 
-                if(!isWithinBounds(board, piece, position)){
+                if(MoveResult.INVALID == isWithinBounds(board, piece, position)){
                     break;
                 }
 
-                if(!piece.isValidMove(board, position)){
+                if(MoveResult.INVALID == piece.isValidMove(board, position)){
                     break;
                 }
                 moves.add(position);
@@ -157,10 +164,67 @@ public class MoveHelper {
         }
     }
 
+    public static void getCastlingMoves(Board board, Piece piece, List<Position> moves){
+        if(piece.getPieceType() != PieceType.KING){
+            return;
+        }
+
+        if(MoveResult.CASTLE_KINGSIDE == canCastleKingSide(board, piece)){
+            moves.add(new Position(6, piece.getPosition().getPosY()));
+        }
+
+        if(MoveResult.CASTLE_QUEENSIDE == canCastleQueenSide(board, piece)){
+            moves.add(new Position(2, piece.getPosition().getPosY()));
+        }
+    }
+
+    public static MoveResult canCastleKingSide(Board board, Piece piece){
+        Position start = piece.getPosition();
+        Position square1 = new Position(5, piece.getPosition().getPosY());
+        Position square2 = new Position(6, piece.getPosition().getPosY());
+        Piece rook = board.getFigureOnSquare(new Position(7, piece.getPosition().getPosY()));
+
+        if(board.getFigureOnSquare(square1) != null || board.getFigureOnSquare(square2) != null){
+            return MoveResult.INVALID;
+        }
+
+        if(rook.haveMoved() || rook.isWhite() != piece.isWhite() || rook.getPieceType() != PieceType.ROOK){
+            return MoveResult.INVALID;
+        }
+
+
+        if(board.kingInCheck(piece.isWhite())) {return MoveResult.INVALID;}
+        if(board.checkAfterMove(start, square1)) {return MoveResult.INVALID;}
+        if(board.checkAfterMove(start, square2)) {return MoveResult.INVALID;}
+
+        return MoveResult.CASTLE_KINGSIDE;
+    }
+
+    public static MoveResult canCastleQueenSide(Board board, Piece piece){
+        Position start = piece.getPosition();
+        Position square1 = new Position(3, piece.getPosition().getPosY());
+        Position square2 = new Position(2, piece.getPosition().getPosY());
+        Piece rook = board.getFigureOnSquare(new Position(0, piece.getPosition().getPosY()));
+
+        if(board.getFigureOnSquare(square1) != null || board.getFigureOnSquare(square2) != null){
+            return MoveResult.INVALID;
+        }
+
+        if(rook.haveMoved() || rook.isWhite() != piece.isWhite() || rook.getPieceType() != PieceType.ROOK){
+            return MoveResult.INVALID;
+        }
+
+        if(board.checkAfterMove(start, start)) {return MoveResult.INVALID;}
+        if(board.checkAfterMove(start, square1)) {return MoveResult.INVALID;}
+        if(board.checkAfterMove(start, square2)) {return MoveResult.INVALID;}
+
+        return MoveResult.CASTLE_QUEENSIDE;
+    }
+
     // helper method to filter valid moves and moves that will prevent or will not lead to check
     public static List<Position> filterMoves(Board board, Piece piece, List<Position> moves){
         return moves.stream()
-                .filter(position -> piece.isValidMove(board, position))
+                .filter(position -> piece.isValidMove(board, position) == MoveResult.VALID)
                 .filter(position -> !board.checkAfterMove(piece.getPosition(), position))
                 .collect(Collectors.toList());
     }

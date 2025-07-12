@@ -13,9 +13,9 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public boolean isValidMove(Board board, Position targetSquare){
-        if(!MoveHelper.isWithinBounds(board, this, targetSquare)){
-            return false;
+    public MoveResult isValidMove(Board board, Position targetSquare){
+        if(MoveResult.INVALID == MoveHelper.isWithinBounds(board, this, targetSquare)){
+            return MoveResult.INVALID;
         }
 
         int direction = this.isWhite() ? -1 : 1;
@@ -31,22 +31,22 @@ public class Pawn extends Piece {
 
         // Check if one move forward is possible
         if(rowDiff == 1 && colDiff == 0 && endSquare == null){
-            return true;
+            return MoveResult.VALID;
         }
 
         // Check if two-square move forward is possible
         if(!this.haveMoved() && rowDiff == 2 && colDiff == 0 && middleSquare == null
                 && endSquare == null) {
-            return true;
+            return MoveResult.VALID;
         }
 
         // Check if there is a piece that can be captured
         if(colDiff == 1 && endSquare != null && (endSquare.isWhite() != this.isWhite())
             && endSquare.getPosition().getPosY() == this.getPosition().getPosY() + direction){
-            return true;
+            return MoveResult.VALID;
         }
 
-        return false;
+        return MoveResult.INVALID;
     }
 
 

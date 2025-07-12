@@ -1,6 +1,7 @@
 package model.figures;
 
 import model.Board;
+import model.MoveResult;
 import model.Position;
 
 import java.util.ArrayList;
@@ -13,9 +14,9 @@ public class King extends Piece {
     }
 
     @Override
-    public boolean isValidMove(Board board, Position targetSquare) {
-        if (!MoveHelper.isWithinBounds(board, this, targetSquare)) {
-            return false;
+    public MoveResult isValidMove(Board board, Position targetSquare) {
+        if (MoveResult.INVALID == MoveHelper.isWithinBounds(board, this, targetSquare)) {
+            return MoveResult.INVALID;
         }
 
         Position start = this.getPosition();
@@ -23,8 +24,20 @@ public class King extends Piece {
         int rowDiff = start.yAbsPosDifference(targetSquare);
         int colDiff = start.xAbsPosDifference(targetSquare);
 
+        if(colDiff == 2 && rowDiff == 0){
+            int row = start.getPosY();
+
+            if(targetSquare.getPosX() == 6){
+                return MoveHelper.canCastleKingSide(board, this);
+            }
+
+            if(targetSquare.getPosX() == 2){
+                return MoveHelper.canCastleQueenSide(board, this);
+            }
+        }
+
         if(rowDiff > 1 || colDiff > 1){
-            return false;
+            return MoveResult.INVALID;
         }
 
         return MoveHelper.isValidTarget(board, this, targetSquare);
@@ -35,7 +48,9 @@ public class King extends Piece {
         List<Position> moves = new ArrayList<>();
         MoveHelper.getDiagonalMoves(board, this, moves, 1);
         MoveHelper.getStraightMoves(board, this, moves, 1);
-        return MoveHelper.filterMoves(board, this, moves);
+        MoveHelper.filterMoves(board, this, moves);
+        MoveHelper.getCastlingMoves(board, this, moves);
+        return moves;
     }
     @Override
     public PieceType getPieceType(){

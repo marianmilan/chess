@@ -1,6 +1,7 @@
 package model.figures;
 
 import model.Board;
+import model.MoveResult;
 import model.Position;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public abstract class Piece {
         this.position = targetSquare;
     }
 
-    public abstract boolean isValidMove(Board board, Position whereTo);
+    public abstract MoveResult isValidMove(Board board, Position whereTo);
 
     public abstract List<Position> getPossibleMoves(Board board);
 

@@ -1,12 +1,10 @@
 package model.figures;
 
 import model.Board;
+import model.MoveResult;
 import model.Position;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Queen extends Piece {
 
@@ -15,12 +13,15 @@ public class Queen extends Piece {
     }
 
     @Override
-    public boolean isValidMove(Board board, Position targetSquare) {
-        if(!MoveHelper.isWithinBounds(board, this, targetSquare)){
-            return false;
+    public MoveResult isValidMove(Board board, Position targetSquare) {
+        if(MoveResult.INVALID == MoveHelper.isWithinBounds(board, this, targetSquare)){
+            return MoveResult.INVALID;
         }
-        return MoveHelper.isStraightValid(board, this, targetSquare)
-            || MoveHelper.isDiagonalValid(board, this, targetSquare);
+
+        if(MoveResult.VALID == MoveHelper.isDiagonalValid(board, this, targetSquare) || MoveResult.VALID == MoveHelper.isStraightValid(board, this, targetSquare)){
+            return MoveResult.VALID;
+        }
+        return MoveResult.INVALID;
     }
 
     @Override
