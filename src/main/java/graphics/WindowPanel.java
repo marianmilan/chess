@@ -5,6 +5,7 @@ import java.util.List;
 import javax.swing.*;
 
 import logic.GameManager;
+import model.Board;
 import model.MoveResult;
 import model.Position;
 import model.figures.Piece;
@@ -17,7 +18,9 @@ public class WindowPanel extends JPanel {
     private final GameManager manager;
 
     public WindowPanel() {
-        setBackground(new Color(152, 118, 84));
+        setBackground(new Color(196, 196, 196));
+        setPreferredSize(new Dimension(640, 640));
+        setBorder(BorderFactory.createLineBorder(Color.black));
         setLayout(new GridBagLayout());
         this.manager = new GameManager();
         this.iconManager = new PieceIconManager();
@@ -83,28 +86,51 @@ public class WindowPanel extends JPanel {
                 PieceType.BISHOP,
                 PieceType.ROOK
         };
-        int n = JOptionPane.showOptionDialog(this, " ",
-                "Promotion", JOptionPane.YES_NO_CANCEL_OPTION,
+        int n = JOptionPane.showOptionDialog(this, "Choose to which piece the pawn to be promoted.",
+                "Promotion Window", JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
         manager.makePromotion((PieceType) options[n], square.posX, square.posY);
         refreshBoard();
     }
 
-    public void endingScreen(){
-        String message = manager.isWhiteTurn() ? "Vyhral cierny" : "Vyhral biely";
-        JOptionPane.showMessageDialog(this, message);
+    public void endingScreen(MoveResult result){
+        String endingMessage;
+        if(result == MoveResult.CHECK_MATE){
+            endingMessage = manager.isWhiteTurn() ? "Black won" : "White won";
+        } else {
+            endingMessage = "Draw";
+        }
+
+        Object[] options = {
+                "New Game",
+                "Exit Game"
+        };
+
+        int n = JOptionPane.showOptionDialog(this, endingMessage, "Result window",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+        if(n == 0){
+            manager.resetGame();
+            refreshBoard();
+        } else {
+            Window window = SwingUtilities.getWindowAncestor(this);
+            if(window != null){
+                window.dispose();
+            }
+            System.exit(0);
+        }
     }
 
     public void requestMove(Square square) {
         refreshBoard();
-
+        Piece target = manager.getBoard().getFigureOnSquare(new Position(square.posX, square.posY));
         // If the square was not selected before, select square and highlight possible moves
         if(selectedSquare == null) {
-            highlightMoves(square);
-            selectedSquare = square;
+            if(target != null && target.isWhite() == manager.isWhiteTurn()){
+                highlightMoves(square);
+                selectedSquare = square;
+            }
         } else {
-            Piece target = manager.getBoard().getFigureOnSquare(new Position(square.posX, square.posY));
-
             // If the target square is same color display new piece highlight moves
             if (target != null && target.isWhite() == manager.isWhiteTurn()) {
                 highlightMoves(square);
@@ -114,18 +140,24 @@ public class WindowPanel extends JPanel {
             // If the move is valid make move and refresh board
             MoveResult result = manager.makeMove(new Position(selectedSquare.posX, selectedSquare.posY), new Position(square.posX, square.posY));
             switch (result){
+                case INVALID -> {
+                    selectedSquare = null;
+                }
+
                 case VALID -> {
                     selectedSquare = null;
                     refreshBoard();
                 }
+
                 case PROMOTION -> {
                     selectedSquare = null;
                     refreshBoard();
                     requestPromotion(square);
                 }
-                case CHECK_MATE -> {
+
+                default -> {
                     refreshBoard();
-                    endingScreen();
+                    endingScreen(result);
                 }
             }
         }
