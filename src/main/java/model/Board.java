@@ -198,6 +198,23 @@ public class Board {
        return true;
     }
 
+    public boolean staleMate(boolean isWhite){
+        if(kingInCheck(isWhite)){
+           return false;
+        }
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece piece = getFigureOnSquare(new Position(i, j));
+                if(piece != null && piece.isWhite() == isWhite && !piece.getPossibleMoves(this).isEmpty()){
+                    return false;
+                }
+            }
+        }
+        return true;
+
+    }
+
     public void promotion(PieceType type, boolean white, int posX, int posY){
         Piece newPiece;
         Position position = new Position(posX, posY);
