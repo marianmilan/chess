@@ -50,8 +50,15 @@ public class King extends Piece {
         MoveHelper.getDiagonalMoves(board, this, moves, 1);
         MoveHelper.getStraightMoves(board, this, moves, 1);
         MoveHelper.getCastlingMoves(board, this, moves);
-
-        return MoveHelper.filterMoves(board, this, moves);
+        return moves.stream()
+                .filter(position -> {
+                    boolean validMove = isValidMove(board, position) == MoveResult.VALID;
+                    boolean validCastle = isValidMove(board, position) == MoveResult.CASTLE_KINGSIDE
+                            || isValidMove(board, position) == MoveResult.CASTLE_QUEENSIDE;
+                    return validMove || validCastle;
+                })
+                .filter(position -> !board.checkAfterMove(this.getPosition(), position))
+                .collect(Collectors.toList());
     }
     @Override
     public PieceType getPieceType(){
