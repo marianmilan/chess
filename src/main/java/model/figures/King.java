@@ -6,6 +6,7 @@ import model.Position;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class King extends Piece {
 
@@ -25,8 +26,6 @@ public class King extends Piece {
         int colDiff = start.xAbsPosDifference(targetSquare);
 
         if(colDiff == 2 && rowDiff == 0){
-            int row = start.getPosY();
-
             if(targetSquare.getPosX() == 6){
                 return MoveHelper.canCastleKingSide(board, this);
             }
