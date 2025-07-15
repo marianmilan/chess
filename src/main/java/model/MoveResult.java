@@ -6,5 +6,6 @@ public enum MoveResult {
     PROMOTION,
     CASTLE_KINGSIDE,
     CASTLE_QUEENSIDE,
-    CHECK_MATE
+    CHECK_MATE,
+    STALE_MATE
 }
