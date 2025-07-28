@@ -25,7 +25,7 @@ public class PieceIconManager {
        icons.put("black_king", new ImageIcon("src/main/resources/black_king.png"));
     }
 
-    public void displayIcon(WindowPanel.Square button, Piece piece){
+    public void displayIcon(ChessBoard.Square button, Piece piece){
         String color = piece.isWhite() ? "white" : "black";
         String iconName = color + "_" + piece.getPieceType().toString().toLowerCase();
         button.setIcon(icons.get(iconName));

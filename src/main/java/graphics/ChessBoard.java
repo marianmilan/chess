@@ -5,22 +5,23 @@ import java.util.List;
 import javax.swing.*;
 
 import logic.GameManager;
-import model.Board;
 import model.MoveResult;
 import model.Position;
 import model.figures.Piece;
 import model.figures.PieceType;
 
-public class WindowPanel extends JPanel {
+public class ChessBoard extends JPanel {
     private final Square[][] squares = new Square[8][8];
     private Square selectedSquare = null;
     private final PieceIconManager iconManager;
     private final GameManager manager;
+    Color light = new Color(214, 189, 157);
+    Color dark = new Color(89, 52, 34);
 
-    public WindowPanel() {
-        setBackground(new Color(196, 196, 196));
-        setPreferredSize(new Dimension(640, 640));
-        setBorder(BorderFactory.createLineBorder(Color.black));
+    public ChessBoard() {
+        setBackground(new Color(243, 243, 243, 255));
+        setPreferredSize(new Dimension(642, 642));
+        setBorder(BorderFactory.createLineBorder(dark, 1));
         setLayout(new GridBagLayout());
         this.manager = new GameManager();
         this.iconManager = new PieceIconManager();
@@ -32,7 +33,7 @@ public class WindowPanel extends JPanel {
         GridBagConstraints grid = new GridBagConstraints();
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-               Color color = (i + j) % 2 == 0 ? Color.WHITE : Color.DARK_GRAY;
+               Color color = (i + j) % 2 == 0 ? light : dark;
                grid.gridx = i;
                grid.gridy = j;
                squares[i][j] = new Square(color, i, j);
@@ -48,7 +49,7 @@ public class WindowPanel extends JPanel {
     public void refreshBoard() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                Color color = (i + j) % 2 == 0 ? Color.WHITE : Color.DARK_GRAY;
+                Color color = (i + j) % 2 == 0 ? light : dark;
                 squares[i][j].setBackground(color);
                 Piece piece = manager.getBoard().getFigureOnSquare(new Position(i, j));
                 if (piece != null) {
@@ -66,14 +67,10 @@ public class WindowPanel extends JPanel {
         if(currentPiece != null && currentPiece.isWhite() == manager.isWhiteTurn()) {
             List<Position> moves = currentPiece.getPossibleMoves(manager.getBoard());
             moves.forEach(position -> {
-                /*
-                 * display valid moves for a piece, if the square is empty (icon == null) add icon of a green circle
-                 *  else if the square has a piece that can be captured highlight the background of the square
-                 */
-                if(squares[position.getPosX()][position.getPosY()].getIcon() == null){
+                if(squares[position.getPosX()][position.getPosY()].getIcon() == null) {
                     squares[position.getPosX()][position.getPosY()].setIcon(new ImageIcon("src/main/resources/mark.png"));
                 } else {
-                    squares[position.getPosX()][position.getPosY()].setBackground(new Color(109, 153, 99, 100));
+                    squares[position.getPosX()][position.getPosY()].setBackground(new Color(176, 126, 80, 180));
                 }
             });
         }

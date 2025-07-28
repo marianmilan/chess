@@ -4,12 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 
 public class GameWindow extends JFrame {
-    public GameWindow(WindowPanel windowPanel){
+    public GameWindow(ChessBoard chessBoard){
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new GridBagLayout());
         setTitle("Chess");
-        setLayout(new BorderLayout());
-        add(windowPanel, BorderLayout.CENTER);
-        setSize(1024, 820);
+        add(chessBoard);
+        setSize(800, 800);
         setLocationRelativeTo(null);
         setVisible(true);
     }
