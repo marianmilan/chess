@@ -8,7 +8,7 @@ import java.util.List;
 
 public abstract class Piece {
 
-    private boolean white = false;
+    private final boolean white;
     private boolean moved = false;
     private Position position;
 
