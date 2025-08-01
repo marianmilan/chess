@@ -132,31 +132,33 @@ public class ChessBoard extends JPanel {
             if (target != null && target.isWhite() == manager.isWhiteTurn()) {
                 highlightMoves(square);
                 selectedSquare = square;
+            } else {
+                // If the move is valid make move and refresh board
+                MoveResult result = manager.makeMove(new Position(selectedSquare.posX, selectedSquare.posY), new Position(square.posX, square.posY));
+                switch (result){
+                    case INVALID -> {
+                        selectedSquare = null;
+                    }
+
+                    case VALID -> {
+                        selectedSquare = null;
+                        refreshBoard();
+                    }
+
+                    case PROMOTION -> {
+                        selectedSquare = null;
+                        refreshBoard();
+                        requestPromotion(square);
+                    }
+
+                    default -> {
+                        refreshBoard();
+                        endingScreen(result);
+                    }
+                }
+
             }
 
-            // If the move is valid make move and refresh board
-            MoveResult result = manager.makeMove(new Position(selectedSquare.posX, selectedSquare.posY), new Position(square.posX, square.posY));
-            switch (result){
-                case INVALID -> {
-                    selectedSquare = null;
-                }
-
-                case VALID -> {
-                    selectedSquare = null;
-                    refreshBoard();
-                }
-
-                case PROMOTION -> {
-                    selectedSquare = null;
-                    refreshBoard();
-                    requestPromotion(square);
-                }
-
-                default -> {
-                    refreshBoard();
-                    endingScreen(result);
-                }
-            }
         }
     }
 
