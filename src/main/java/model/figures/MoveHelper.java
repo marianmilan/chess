@@ -1,6 +1,7 @@
 package model.figures;
 
 import model.Board;
+import model.Move;
 import model.MoveResult;
 import model.Position;
 
@@ -109,7 +110,7 @@ public class MoveHelper {
         return MoveResult.INVALID;
     }
 
-    public static void getDiagonalMoves(Board board, Piece piece, List<Position> moves, int numOfSquares){
+    public static void getDiagonalMoves(Board board, Piece piece, List<Move> moves, int numOfSquares){
        int[][] diagonal = {
                {-1, -1}, {-1, 1}, {1, -1}, {1, 1}
        };
@@ -132,12 +133,12 @@ public class MoveHelper {
                    break;
                }
 
-               moves.add(position);
+               moves.add(new Move(piece.getPosition(), position, piece, board.getFigureOnSquare(position), false));
            }
        }
     }
 
-    public static void getStraightMoves(Board board, Piece piece, List<Position> moves, int numOfSquares){
+    public static void getStraightMoves(Board board, Piece piece, List<Move> moves, int numOfSquares){
         int[][] straight = {
                 {0, -1}, {0, 1}, {-1, 0}, {1, 0}
         };
@@ -159,22 +160,24 @@ public class MoveHelper {
                 if(MoveResult.INVALID == piece.isValidMove(board, position)){
                     break;
                 }
-                moves.add(position);
+                moves.add(new Move(piece.getPosition(), position, piece, board.getFigureOnSquare(position), false));
             }
         }
     }
 
-    public static void getCastlingMoves(Board board, Piece piece, List<Position> moves){
+    public static void getCastlingMoves(Board board, Piece piece, List<Move> moves){
         if(piece.getPieceType() != PieceType.KING){
             return;
         }
 
         if(MoveResult.CASTLE_KINGSIDE == canCastleKingSide(board, piece)){
-            moves.add(new Position(6, piece.getPosition().getPosY()));
+            Position castlePosition = new Position(6, piece.getPosition().getPosY());
+            moves.add(new Move(piece.getPosition(), castlePosition, piece, null, true));
         }
 
         if(MoveResult.CASTLE_QUEENSIDE == canCastleQueenSide(board, piece)){
-            moves.add(new Position(2, piece.getPosition().getPosY()));
+            Position castlePosition = new Position(2, piece.getPosition().getPosY());
+            moves.add(new Move(piece.getPosition(), castlePosition, piece, null, true));
         }
     }
 
@@ -222,10 +225,10 @@ public class MoveHelper {
     }
 
     // helper method to filter valid moves and moves that will prevent or will not lead to check
-    public static List<Position> filterMoves(Board board, Piece piece, List<Position> moves){
+    public static List<Move> filterMoves(Board board, Piece piece, List<Move> moves){
         return moves.stream()
-                .filter(position -> piece.isValidMove(board, position) == MoveResult.VALID)
-                .filter(position -> !board.checkAfterMove(piece.getPosition(), position))
+                .filter(move -> piece.isValidMove(board, move.to) == MoveResult.VALID)
+                .filter(move -> !board.checkAfterMove(piece.getPosition(), move.to))
                 .collect(Collectors.toList());
     }
 }

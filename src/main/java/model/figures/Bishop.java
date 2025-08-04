@@ -1,6 +1,7 @@
 package model.figures;
 
 import model.Board;
+import model.Move;
 import model.MoveResult;
 import model.Position;
 
@@ -8,6 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bishop extends Piece {
+    public static final int[][] positionRank = {
+            {-20, -10, -10, -10, -10, -10, -10, -20 },
+            {-10,   0,   0,   0,   0,   0,   0, -10 },
+            {-10,   0,   5,  10,  10,   5,   0, -10 },
+            {-10,   5,   5,  10,  10,   5,   5, -10 },
+            {-10,   0,  10,  10,  10,  10,   0, -10 },
+            {-10,  10,  10,  10,  10,  10,  10, -10 },
+            {-10,   5,   0,   0,   0,   0,   5, -10 },
+            {-20, -10, -10, -10, -10, -10, -10, -20 }
+    };
 
     public Bishop(boolean white, Position position){
         super(white, position);
@@ -24,8 +35,8 @@ public class Bishop extends Piece {
     }
 
     @Override
-    public List<Position> getPossibleMoves(Board board){
-        List<Position> moves = new ArrayList<>();
+    public List<Move> getPossibleMoves(Board board){
+        List<Move> moves = new ArrayList<>();
         MoveHelper.getDiagonalMoves(board, this, moves, 8);
         return MoveHelper.filterMoves(board, this, moves);
     }
@@ -33,5 +44,17 @@ public class Bishop extends Piece {
     @Override
     public PieceType getPieceType(){
         return PieceType.BISHOP;
+    }
+
+    @Override
+    public int getValue() {
+        int col = this.getPosition().getPosX();
+        int row = this.getPosition().getPosY();
+
+        if(!this.isWhite()){
+            row = 7 - row;
+        }
+        int value = 500 + positionRank[row][col];
+        return this.isWhite() ? value : -value;
     }
 }

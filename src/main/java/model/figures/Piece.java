@@ -1,6 +1,7 @@
 package model.figures;
 
 import model.Board;
+import model.Move;
 import model.MoveResult;
 import model.Position;
 
@@ -39,8 +40,9 @@ public abstract class Piece {
 
     public abstract MoveResult isValidMove(Board board, Position whereTo);
 
-    public abstract List<Position> getPossibleMoves(Board board);
+    public abstract List<Move> getPossibleMoves(Board board);
 
     public abstract PieceType getPieceType();
 
+    public abstract int getValue();
 }
