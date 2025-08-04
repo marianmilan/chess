@@ -2,8 +2,14 @@ package model;
 
 import model.figures.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
 public class Board {
     private final Piece[][] board = new Piece[8][8];
+    private List<Move> moves = new Stack<>();
+    private int boardEval;
 
     public Board(){
         setupBoard();
@@ -16,6 +22,14 @@ public class Board {
         placeBishops();
         placeQueens();
         placeKings();
+        for(int i = 0; i < 8; i++) {
+            for(int j = 0; j < 8; j++) {
+                Piece piece = getFigureOnSquare(new Position(i, j));
+                if(piece != null){
+                    setBoardEval(piece.getValue());
+                }
+            }
+        }
     }
 
     private void placePawns(){
@@ -76,13 +90,17 @@ public class Board {
     }
 
     public Piece getFigureOnSquare(Position position) {
-        return board[position.getPosX()][position.getPosY()];
+        if(position.getPosX() > 7 || position.getPosX() < 0 || position.getPosY() > 7 || position.getPosY() < 0){
+            return null;
+        } else {
+            return board[position.getPosX()][position.getPosY()];
+        }
     }
 
     public MoveResult movePiece(Position start, Position targetSquare, boolean whiteTurn){
         Piece piece = getFigureOnSquare(start);
 
-        if(piece == null || piece.isWhite() != whiteTurn || MoveResult.INVALID == piece.isValidMove(this, targetSquare)){
+        if(piece == null || piece.isWhite() != whiteTurn || MoveResult.INVALID == piece.isValidMove(this, targetSquare)) {
             return MoveResult.INVALID;
         }
 
@@ -127,13 +145,12 @@ public class Board {
             piece.setPosition(targetSquare);
             piece.setMoved();
 
-            if(piece.getPieceType() == PieceType.PAWN){
+            if(piece.getPieceType() == PieceType.PAWN) {
                 boolean needPromotion = piece.isWhite() ? piece.getPosition().getPosY() == 0 : piece.getPosition().getPosY() == 7;
                 if(needPromotion){
                     return MoveResult.PROMOTION;
                 }
             }
-
             return MoveResult.VALID;
         }
         return MoveResult.INVALID;
@@ -215,10 +232,51 @@ public class Board {
 
     }
 
+    public void setBoardEval(int value) {
+        boardEval += value;
+    }
+
+    public int getBoardEval() {
+        return boardEval;
+    }
+
+    public void makeMove(Move move) {
+        board[move.from.getPosX()][move.from.getPosY()] = null;
+
+        if(move.capturedPiece != null){
+            board[move.to.getPosX()][move.to.getPosY()] = null;
+            setBoardEval(move.capturedPiece.getValue());
+        }
+        board[move.to.getPosX()][move.to.getPosY()] = move.movedPiece;
+        move.movedPiece.setPosition(move.to);
+    }
+
+    public void undoMove(Move move) {
+        board[move.from.getPosX()][move.from.getPosY()] = move.movedPiece;
+        if(move.capturedPiece != null) {
+            setBoardEval(move.capturedPiece.getValue());
+        }
+        board[move.to.getPosX()][move.to.getPosY()] = move.capturedPiece;
+        move.movedPiece.setPosition(move.from);
+    }
+
+    public List<Move> getAllPossibleMoves(boolean isWhite){
+        List<Move> moves = new ArrayList<>();
+        for(int i = 0; i < 8; i++){
+            for(int j = 0; j < 8; j++){
+                Piece piece = getFigureOnSquare(new Position(i, j));
+                if(piece != null && piece.isWhite() == isWhite){
+                    moves.addAll(piece.getPossibleMoves(this));
+                }
+            }
+        }
+        return moves;
+    }
+
     public void promotion(PieceType type, boolean white, int posX, int posY){
         Piece newPiece;
         Position position = new Position(posX, posY);
-        switch (type){
+        switch (type) {
             case QUEEN -> newPiece = new Queen(white, position);
             case BISHOP -> newPiece = new Bishop(white, position);
             case KNIGHT -> newPiece = new Knight(white, position);
