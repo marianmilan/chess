@@ -5,6 +5,7 @@ import java.util.List;
 import javax.swing.*;
 
 import logic.GameManager;
+import model.Move;
 import model.MoveResult;
 import model.Position;
 import model.figures.Piece;
@@ -31,17 +32,17 @@ public class ChessBoard extends JPanel {
 
     private void setupChessBoard() {
         GridBagConstraints grid = new GridBagConstraints();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-               Color color = (i + j) % 2 == 0 ? light : dark;
-               grid.gridx = i;
-               grid.gridy = j;
-               squares[i][j] = new Square(color, i, j);
-               squares[i][j].addActionListener(event -> {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+               Color color = (row + col) % 2 == 0 ? light : dark;
+               grid.gridx = col;
+               grid.gridy = row;
+               squares[row][col] = new Square(color, row, col);
+               squares[row][col].addActionListener(event -> {
                    Square clicked = (Square) event.getSource();
-                   requestMove(clicked);
+                   playerMove(clicked);
                });
-               add(squares[i][j], grid);
+               add(squares[row][col], grid);
             }
         }
     }
@@ -52,11 +53,7 @@ public class ChessBoard extends JPanel {
                 Color color = (i + j) % 2 == 0 ? light : dark;
                 squares[i][j].setBackground(color);
                 Piece piece = manager.getBoard().getFigureOnSquare(new Position(i, j));
-                if (piece != null) {
-                    iconManager.displayIcon(squares[i][j], piece);
-                } else {
-                    squares[i][j].setIcon(null);
-                }
+                iconManager.displayIcon(squares[i][j], piece);
             }
         }
     }
@@ -65,18 +62,18 @@ public class ChessBoard extends JPanel {
         Piece currentPiece = manager.getBoard().getFigureOnSquare(new Position(square.posX, square.posY));
 
         if(currentPiece != null && currentPiece.isWhite() == manager.isWhiteTurn()) {
-            List<Position> moves = currentPiece.getPossibleMoves(manager.getBoard());
-            moves.forEach(position -> {
-                if(squares[position.getPosX()][position.getPosY()].getIcon() == null) {
-                    squares[position.getPosX()][position.getPosY()].setIcon(new ImageIcon("src/main/resources/mark.png"));
+            List<Move> moves = currentPiece.getPossibleMoves(manager.getBoard());
+            moves.forEach(move -> {
+                if(squares[move.to.getPosX()][move.to.getPosY()].getIcon() == null) {
+                    squares[move.to.getPosX()][move.to.getPosY()].setIcon(new ImageIcon("src/main/resources/mark.png"));
                 } else {
-                    squares[position.getPosX()][position.getPosY()].setBackground(new Color(176, 126, 80, 180));
+                    squares[move.to.getPosX()][move.to.getPosY()].setBackground(new Color(176, 126, 80, 180));
                 }
             });
         }
     }
 
-    public void requestPromotion(Square square){
+    public PieceType requestPromotion(){
         Object[] options = {
                 PieceType.QUEEN,
                 PieceType.KNIGHT,
@@ -86,8 +83,7 @@ public class ChessBoard extends JPanel {
         int n = JOptionPane.showOptionDialog(this, "Choose to which piece the pawn to be promoted.",
                 "Promotion Window", JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-        manager.makePromotion((PieceType) options[n], square.posX, square.posY);
-        refreshBoard();
+        return (PieceType) options[n];
     }
 
     public void endingScreen(MoveResult result){
@@ -118,7 +114,43 @@ public class ChessBoard extends JPanel {
         }
     }
 
-    public void requestMove(Square square) {
+    public void requestMove(Position from, Position to) {
+        MoveResult result = manager.applyMove(from, to);
+        switch (result){
+            case INVALID -> {
+                selectedSquare = null;
+            }
+
+            case VALID -> {
+                selectedSquare = null;
+                refreshBoard();
+                nextTurn();
+            }
+
+            case PROMOTION -> {
+                if(manager.isWhiteTurn()){
+                    selectedSquare = null;
+                    manager.applyPromotion(requestPromotion(), to.getPosX(), to.getPosY());
+                }
+                refreshBoard();
+                nextTurn();
+            }
+
+            default -> {
+                refreshBoard();
+                endingScreen(result);
+            }
+        }
+    }
+
+    public void nextTurn(){
+        if(!manager.isWhiteTurn()){
+            manager.computerMove();
+            refreshBoard();
+        }
+    }
+
+    public void playerMove(Square square) {
         refreshBoard();
         Piece target = manager.getBoard().getFigureOnSquare(new Position(square.posX, square.posY));
         // If the square was not selected before, select square and highlight possible moves
@@ -133,32 +165,8 @@ public class ChessBoard extends JPanel {
                 highlightMoves(square);
                 selectedSquare = square;
             } else {
-                // If the move is valid make move and refresh board
-                MoveResult result = manager.makeMove(new Position(selectedSquare.posX, selectedSquare.posY), new Position(square.posX, square.posY));
-                switch (result){
-                    case INVALID -> {
-                        selectedSquare = null;
-                    }
-
-                    case VALID -> {
-                        selectedSquare = null;
-                        refreshBoard();
-                    }
-
-                    case PROMOTION -> {
-                        selectedSquare = null;
-                        refreshBoard();
-                        requestPromotion(square);
-                    }
-
-                    default -> {
-                        refreshBoard();
-                        endingScreen(result);
-                    }
-                }
-
+                requestMove(new Position(selectedSquare.posX, selectedSquare.posY), new Position(square.posX, square.posY));
             }
-
         }
     }
 

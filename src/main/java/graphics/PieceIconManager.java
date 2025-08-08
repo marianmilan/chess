@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PieceIconManager {
-    private Map<String, ImageIcon> icons;
+    private final Map<String, ImageIcon> icons;
 
     public PieceIconManager(){
        icons = new HashMap<>();
@@ -26,6 +26,10 @@ public class PieceIconManager {
     }
 
     public void displayIcon(ChessBoard.Square button, Piece piece){
+        if(piece == null){
+            button.setIcon(null);
+            return;
+        }
         String color = piece.isWhite() ? "white" : "black";
         String iconName = color + "_" + piece.getPieceType().toString().toLowerCase();
         button.setIcon(icons.get(iconName));
