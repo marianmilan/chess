@@ -1,15 +1,18 @@
 package model;
 
 import model.figures.Piece;
-import model.figures.PieceType;
 
 public class Move {
     public final Position from;
     public final Position to;
     public final Piece movedPiece;
     public final Piece capturedPiece;
-    public PieceType promotingTo;
+    public  Piece promotingPawn;
     public boolean wasCastling;
+    public boolean promotingMove;
+    public boolean firstMove;
+    public Piece castleRook;
+    public Position castleRookPos;
 
     public Move(Position from, Position to, Piece movedPiece, Piece capturedPiece, boolean wasCastling){
         this.from = from;
@@ -17,14 +20,7 @@ public class Move {
         this.movedPiece = movedPiece;
         this.capturedPiece = capturedPiece;
         this.wasCastling = wasCastling;
-        this.promotingTo = null;
-    }
-
-    public void setPromotingTo(){
-        this.promotingTo = PieceType.QUEEN;
-    }
-
-    public boolean isPromoting(){
-        return promotingTo != null;
+        promotingMove = false;
+        firstMove = false;
     }
 }

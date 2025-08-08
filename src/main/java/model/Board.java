@@ -8,11 +8,13 @@ import java.util.Stack;
 
 public class Board {
     private final Piece[][] board = new Piece[8][8];
-    private List<Move> moves = new Stack<>();
-    private int boardEval;
+    private final Stack<Move> moves = new Stack<>();
+    private boolean whiteToMove;
 
     public Board(){
         setupBoard();
+        whiteToMove = true;
+        System.out.println(getBoardEval());
     }
 
     private void setupBoard(){
@@ -22,67 +24,63 @@ public class Board {
         placeBishops();
         placeQueens();
         placeKings();
-        for(int i = 0; i < 8; i++) {
-            for(int j = 0; j < 8; j++) {
-                Piece piece = getFigureOnSquare(new Position(i, j));
-                if(piece != null){
-                    setBoardEval(piece.getValue());
-                }
-            }
-        }
     }
 
     private void placePawns(){
         for(int i = 0; i < 8; i++){
-            board[i][6] = new Pawn(true, new Position(i, 6));
-            board[i][1] = new Pawn(false, new Position(i, 1));
+            board[6][i] = new Pawn(true, new Position(6, i));
+            board[1][i] = new Pawn(false, new Position(1, i));
         }
     }
 
     private void placeRooks(){
         // Place black rooks
         board[0][0] = new Rook(false, new Position(0,0));
-        board[7][0] = new Rook(false, new Position(7, 0));
+        board[0][7] = new Rook(false, new Position(0, 7));
 
         // Place white rooks
-        board[0][7] = new Rook(true, new Position(0, 7));
+        board[7][0] = new Rook(true, new Position(7, 0));
         board[7][7] = new Rook(true, new Position(7, 7));
     }
 
     private void placeKnights(){
         // Place black knights
-        board[1][0] = new Knight(false, new Position(1,0));
-        board[6][0] = new Knight(false, new Position(6, 0));
+        board[0][1] = new Knight(false, new Position(0,1));
+        board[0][6] = new Knight(false, new Position(0, 6));
 
         // Place white knights
-        board[1][7] = new Knight(true, new Position(1, 7));
-        board[6][7] = new Knight(true, new Position(6, 7));
+        board[7][1] = new Knight(true, new Position(7, 1));
+        board[7][6] = new Knight(true, new Position(7, 6));
     }
 
     private void placeBishops(){
         // Place black bishops
-        board[2][0] = new Bishop(false, new Position(2, 0));
-        board[5][0] = new Bishop(false, new Position(5, 0));
+        board[0][2] = new Bishop(false, new Position(0, 2));
+        board[0][5] = new Bishop(false, new Position(0, 5));
 
         // Place white bishops
-        board[2][7] = new Bishop(true, new Position(2, 7));
-        board[5][7] = new Bishop(true, new Position(5, 7));
+        board[7][2] = new Bishop(true, new Position(7, 2));
+        board[7][5] = new Bishop(true, new Position(7, 5));
     }
 
     private void placeQueens(){
         // Place black queen
-        board[3][0] = new Queen(false, new Position(3, 0));
+        board[0][3] = new Queen(false, new Position(0, 3));
 
         // Place white queen
-        board[3][7] = new Queen(true, new Position(3, 7));
+        board[7][3] = new Queen(true, new Position(7, 3));
     }
 
     private void placeKings(){
         // Place black king
-        board[4][0] = new King(false, new Position(4, 0));
+        board[0][4] = new King(false, new Position(0, 4));
 
         // Place white king
-        board[4][7] = new King(true, new Position(4, 7));
+        board[7][4] = new King(true, new Position(7, 4));
+    }
+
+    public void changeTurns(){
+        whiteToMove = !whiteToMove;
     }
 
     public Piece[][] getBoard(){
@@ -106,36 +104,35 @@ public class Board {
 
         if(!checkAfterMove(start, targetSquare)){
             if (PieceType.KING == piece.getPieceType() && MoveResult.CASTLE_KINGSIDE == piece.isValidMove(this, targetSquare)) {
-                int posY = piece.getPosition().getPosY();
-                Piece rook = getFigureOnSquare(new Position(7, posY));
+                int row = piece.getPosition().getPosX();
+                Piece rook = getFigureOnSquare(new Position(row, 7));
 
-                rook.setPosition(new Position(5, posY));
+                rook.setPosition(new Position(row, 5));
                 rook.setMoved();
 
-                piece.setPosition(new Position(6, posY));
+                piece.setPosition(new Position(row, 7));
                 piece.setMoved();
-                board[start.getPosX()][posY] = null;
-                board[7][posY] = null;
-                board[5][posY] = rook;
-                board[6][posY] = piece;
-
+                board[row][start.getPosY()] = null;
+                board[row][7] = null;
+                board[row][5] = rook;
+                board[row][6] = piece;
                 return MoveResult.VALID;
             }
 
             if (PieceType.KING == piece.getPieceType() && MoveResult.CASTLE_QUEENSIDE == piece.isValidMove(this, targetSquare)) {
-                int posY = piece.getPosition().getPosY();
-                Piece rook = getFigureOnSquare(new Position(0, posY));
+                int row = piece.getPosition().getPosX();
+                Piece rook = getFigureOnSquare(new Position(row, 0));
 
-                rook.setPosition(new Position(3, posY));
+                rook.setPosition(new Position(row, 3));
                 rook.setMoved();
 
-                piece.setPosition(new Position(2, posY));
+                piece.setPosition(new Position(row, 2));
                 piece.setMoved();
 
-                board[start.getPosX()][posY] = null;
-                board[0][posY] = null;
-                board[3][posY] = rook;
-                board[2][posY] = piece;
+                board[row][start.getPosX()] = null;
+                board[row][0] = null;
+                board[row][3] = rook;
+                board[row][2] = piece;
                 return MoveResult.VALID;
             }
 
@@ -146,7 +143,7 @@ public class Board {
             piece.setMoved();
 
             if(piece.getPieceType() == PieceType.PAWN) {
-                boolean needPromotion = piece.isWhite() ? piece.getPosition().getPosY() == 0 : piece.getPosition().getPosY() == 7;
+                boolean needPromotion = piece.isWhite() ? piece.getPosition().getPosX() == 0 : piece.getPosition().getPosX() == 7;
                 if(needPromotion){
                     return MoveResult.PROMOTION;
                 }
@@ -157,20 +154,24 @@ public class Board {
     }
 
     public boolean checkAfterMove(Position start, Position targetSquare){
-        Piece piece = getFigureOnSquare(start);
-        Piece capturedPiece = getFigureOnSquare(targetSquare);
+        try {
+            Piece piece = getFigureOnSquare(start);
+            Piece capturedPiece = getFigureOnSquare(targetSquare);
 
-        board[start.getPosX()][start.getPosY()] = null;
-        board[targetSquare.getPosX()][targetSquare.getPosY()] = piece;
-        piece.setPosition(targetSquare);
+            board[start.getPosX()][start.getPosY()] = null;
+            board[targetSquare.getPosX()][targetSquare.getPosY()] = piece;
+            piece.setPosition(targetSquare);
 
-        boolean isInCheck = kingInCheck(piece.isWhite());
+            boolean isInCheck = kingInCheck(piece.isWhite());
 
-        board[start.getPosX()][start.getPosY()] = piece;
-        board[targetSquare.getPosX()][targetSquare.getPosY()] = capturedPiece;
-        piece.setPosition(start);
+            board[start.getPosX()][start.getPosY()] = piece;
+            board[targetSquare.getPosX()][targetSquare.getPosY()] = capturedPiece;
+            piece.setPosition(start);
 
-        return isInCheck;
+            return isInCheck;
+        } catch (Exception e) {
+            throw new RuntimeException(start + " " + targetSquare);
+        }
     }
 
     public Position findKingPosition(boolean isWhite){
@@ -232,31 +233,115 @@ public class Board {
 
     }
 
-    public void setBoardEval(int value) {
-        boardEval += value;
+    public boolean gameOver(boolean isWhite) {
+        return checkMate(isWhite) || staleMate(isWhite);
+    }
+
+    public int evalPieces(boolean isWhite){
+        int eval = 0;
+        for(int i = 0; i < 8; i++){
+            for(int j = 0; j < 8; j++) {
+                Piece piece = getFigureOnSquare(new Position(i, j));
+                if(piece != null && piece.isWhite() == isWhite) {
+                    eval += piece.getValue();
+                }
+            }
+        }
+        return eval;
     }
 
     public int getBoardEval() {
-        return boardEval;
+        int whitePieces = evalPieces(true);
+        int blackPieces = evalPieces(false);
+
+        return blackPieces - whitePieces;
     }
 
-    public void makeMove(Move move) {
-        board[move.from.getPosX()][move.from.getPosY()] = null;
+    public void makeMove(Move move){
+        if(checkAfterMove(move.from, move.to)) return;
+        if(move.to.equals(findKingPosition(!move.movedPiece.isWhite()))) return;
 
-        if(move.capturedPiece != null){
-            board[move.to.getPosX()][move.to.getPosY()] = null;
-            setBoardEval(move.capturedPiece.getValue());
+        int fromX = move.from.getPosX();
+        int fromY = move.from.getPosY();
+        int toX = move.to.getPosX();
+        int toY = move.to.getPosY();
+
+        if(!move.movedPiece.haveMoved()){
+            move.firstMove = true;
+            move.movedPiece.setMoved();
         }
-        board[move.to.getPosX()][move.to.getPosY()] = move.movedPiece;
+
+        if(move.promotingMove){
+            board[fromX][fromY] = null;
+            promotion(PieceType.QUEEN, move.movedPiece.isWhite(), toX, toY);
+            moves.push(move);
+            return;
+        }
+
+        if(move.wasCastling){
+            int rookX = move.castleRook.getPosition().getPosX();
+            int rookY = move.castleRook.getPosition().getPosY();
+            int newRookY = rookY == 0 ? 3 : 5;
+
+            board[fromX][fromY] = null;
+            board[rookX][rookY] = null;
+            board[toX][toY] = move.movedPiece;
+            board[rookX][newRookY] = move.castleRook;
+
+            move.movedPiece.setPosition(move.to);
+            move.castleRook.setPosition(new Position(rookX, newRookY));
+
+            move.castleRook.setMoved();
+
+            moves.push(move);
+            return;
+        }
+
+        board[fromX][fromY] = null;
+        board[toX][toY] = move.movedPiece;
         move.movedPiece.setPosition(move.to);
+        moves.push(move);
     }
 
-    public void undoMove(Move move) {
-        board[move.from.getPosX()][move.from.getPosY()] = move.movedPiece;
-        if(move.capturedPiece != null) {
-            setBoardEval(move.capturedPiece.getValue());
+    public void undoMove() {
+        Move move = moves.pop();
+        int fromX = move.from.getPosX();
+        int fromY = move.from.getPosY();
+        int toX = move.to.getPosX();
+        int toY = move.to.getPosY();
+
+        if(move.firstMove) {
+            move.movedPiece.undoMoved();
+            move.firstMove = false;
         }
-        board[move.to.getPosX()][move.to.getPosY()] = move.capturedPiece;
+
+        if(move.wasCastling) {
+            int oldRookX = move.castleRook.getPosition().getPosX();
+            int oldRookY = move.castleRook.getPosition().getPosY();
+
+            int rookX = move.castleRookPos.getPosX();
+            int rookY = move.castleRookPos.getPosY();
+
+
+            board[fromX][fromY] = move.movedPiece;
+            board[rookX][rookY] = move.castleRook;
+            board[toX][toY] = null;
+            board[oldRookX][oldRookY] = null;
+
+            move.castleRook.undoMoved();
+            move.movedPiece.setPosition(move.from);
+            move.castleRook.setPosition(move.castleRookPos);
+            return;
+        }
+
+        if(move.promotingMove) {
+            board[toX][toY] = move.capturedPiece;
+            board[fromX][fromY] = move.promotingPawn;
+            return;
+        }
+
+        board[fromX][fromY] = move.movedPiece;
+        board[toX][toY] = move.capturedPiece;
         move.movedPiece.setPosition(move.from);
     }
 
@@ -285,4 +370,5 @@ public class Board {
         }
         board[posX][posY] = newPiece;
     }
+
 }
