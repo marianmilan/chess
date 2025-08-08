@@ -48,13 +48,12 @@ public class Rook extends Piece {
 
     @Override
     public int getValue() {
-        int col = this.getPosition().getPosX();
-        int row = this.getPosition().getPosY();
+        int row = this.getPosition().getPosX();
+        int col = this.getPosition().getPosY();
 
-        if(!this.isWhite()){
+        if(this.isWhite()){
             row = 7 - row;
         }
-        int value = 500 + positionRank[row][col];
-        return this.isWhite() ? value : -value;
+        return 500 + positionRank[row][col];
     }
 }

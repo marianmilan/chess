@@ -170,22 +170,39 @@ public class MoveHelper {
             return;
         }
 
+        int row = piece.isWhite() ? 7 : 0;
         if(MoveResult.CASTLE_KINGSIDE == canCastleKingSide(board, piece)){
-            Position castlePosition = new Position(6, piece.getPosition().getPosY());
-            moves.add(new Move(piece.getPosition(), castlePosition, piece, null, true));
+            Position castlePosition = new Position(row, 6);
+            Move move = new Move(piece.getPosition(), castlePosition, piece, null, true);
+            Piece rook = board.getFigureOnSquare(new Position(row, 7));
+            if (rook == null){
+                return;
+            }
+            move.castleRook = rook;
+            move.castleRookPos = rook.getPosition();
+            moves.add(move);
         }
 
         if(MoveResult.CASTLE_QUEENSIDE == canCastleQueenSide(board, piece)){
-            Position castlePosition = new Position(2, piece.getPosition().getPosY());
-            moves.add(new Move(piece.getPosition(), castlePosition, piece, null, true));
+            Position castlePosition = new Position(row, 2);
+            Move move = new Move(piece.getPosition(), castlePosition, piece, null, true);
+            Piece rook = board.getFigureOnSquare(new Position(row, 7));
+            if (rook == null){
+                return;
+            }
+            move.castleRook = rook;
+            move.castleRookPos = rook.getPosition();
+            moves.add(move);
         }
     }
 
     public static MoveResult canCastleKingSide(Board board, Piece piece){
         Position start = piece.getPosition();
-        Position square1 = new Position(5, piece.getPosition().getPosY());
-        Position square2 = new Position(6, piece.getPosition().getPosY());
-        Piece rook = board.getFigureOnSquare(new Position(7, piece.getPosition().getPosY()));
+        int row = start.getPosX();
+
+        Position square1 = new Position(row, 5);
+        Position square2 = new Position(row, 6);
+        Piece rook = board.getFigureOnSquare(new Position(row, 7));
 
         if(board.getFigureOnSquare(square1) != null || board.getFigureOnSquare(square2) != null){
             return MoveResult.INVALID;
@@ -205,11 +222,14 @@ public class MoveHelper {
 
     public static MoveResult canCastleQueenSide(Board board, Piece piece){
         Position start = piece.getPosition();
-        Position square1 = new Position(3, piece.getPosition().getPosY());
-        Position square2 = new Position(2, piece.getPosition().getPosY());
-        Piece rook = board.getFigureOnSquare(new Position(0, piece.getPosition().getPosY()));
+        int row = start.getPosX();
 
-        if(board.getFigureOnSquare(square1) != null || board.getFigureOnSquare(square2) != null){
+        Position square1 = new Position(row, 1);
+        Position square2 = new Position(row, 2);
+        Position square3 = new Position(row, 3);
+        Piece rook = board.getFigureOnSquare(new Position(row, 0));
+
+        if(board.getFigureOnSquare(square1) != null || board.getFigureOnSquare(square2) != null || board.getFigureOnSquare(square3) != null){
             return MoveResult.INVALID;
         }
 
@@ -228,7 +248,7 @@ public class MoveHelper {
     public static List<Move> filterMoves(Board board, Piece piece, List<Move> moves){
         return moves.stream()
                 .filter(move -> piece.isValidMove(board, move.to) == MoveResult.VALID)
-                .filter(move -> !board.checkAfterMove(piece.getPosition(), move.to))
+                .filter(move -> !board.checkAfterMove(move.from, move.to))
                 .collect(Collectors.toList());
     }
 }

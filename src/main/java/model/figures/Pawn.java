@@ -30,10 +30,10 @@ public class Pawn extends Piece {
         int direction = this.isWhite() ? -1 : 1;
 
         Position start = this.getPosition();
-        Position middle = new Position(start.getPosX(), start.getPosY() + direction);
+        Position middle = new Position(start.getPosX() + direction, start.getPosY());
 
-        int rowDiff = start.yAbsPosDifference(targetSquare);
-        int colDiff = start.xAbsPosDifference(targetSquare);
+        int rowDiff = start.xAbsPosDifference(targetSquare);
+        int colDiff = start.yAbsPosDifference(targetSquare);
 
         Piece middleSquare = board.getFigureOnSquare(middle);
         Piece endSquare = board.getFigureOnSquare(targetSquare);
@@ -50,8 +50,8 @@ public class Pawn extends Piece {
         }
 
         // Check if there is a piece that can be captured
-        if(colDiff == 1 && endSquare != null && (endSquare.isWhite() != this.isWhite())
-            && endSquare.getPosition().getPosY() == this.getPosition().getPosY() + direction){
+        if(rowDiff == 1 && colDiff == 1 && endSquare != null && (endSquare.isWhite() != this.isWhite())
+            && endSquare.getPosition().getPosX() == this.getPosition().getPosX() + direction){
             return MoveResult.VALID;
         }
 
@@ -69,8 +69,8 @@ public class Pawn extends Piece {
         List<Move> moves = new ArrayList<>();
 
         Position start = this.getPosition();
-        Position oneStraight = new Position(currentPosX, currentPosY + direction);
-        Position twoStraight = new Position(currentPosX, currentPosY + 2 * direction);
+        Position oneStraight = new Position(currentPosX + direction, currentPosY);
+        Position twoStraight = new Position(currentPosX + 2 * direction, currentPosY);
 
         if(!this.haveMoved()){
             moves.add(new Move(start, twoStraight, this, null, false));
@@ -78,21 +78,23 @@ public class Pawn extends Piece {
         if(board.getFigureOnSquare(oneStraight) == null) {
             Move move = new Move(start, oneStraight, this, null, false);
             if(oneStraight.getPosY() == promotionRow) {
-                move.setPromotingTo();
+                move.promotingMove = true;
+                move.promotingPawn = this;
             }
             moves.add(move);
         }
 
         for(int dx : new int[]{-1, 1}){
-            Position diagonal = new Position(currentPosX + dx, currentPosY + direction);
-            if(diagonal.getPosX() <= 7 && diagonal.getPosX() >= 0){
+            Position diagonal = new Position(currentPosX + direction, currentPosY + dx);
+            if(diagonal.getPosY() <= 7 && diagonal.getPosY() >= 0){
                 Piece target = board.getFigureOnSquare(diagonal);
                 if(target != null && target.isWhite() != this.isWhite()){
-                    Move capture = new Move(start, diagonal, this, target, false);
+                    Move move = new Move(start, diagonal, this, target, false);
                     if(diagonal.getPosY() == promotionRow){
-                        capture.setPromotingTo();
+                        move.promotingMove = true;
+                        move.promotingPawn = this;
                     }
-                    moves.add(capture);
+                    moves.add(move);
                 }
             }
         }
@@ -107,13 +109,12 @@ public class Pawn extends Piece {
 
     @Override
     public int getValue() {
-        int col = this.getPosition().getPosX();
-        int row = this.getPosition().getPosY();
+        int row = this.getPosition().getPosX();
+        int col = this.getPosition().getPosY();
 
-        if(!this.isWhite()){
+        if(this.isWhite()){
             row = 7 - row;
         }
-        int value = 500 + positionRank[row][col];
-        return this.isWhite() ? value : -value;
+        return 100 + positionRank[row][col];
     }
 }

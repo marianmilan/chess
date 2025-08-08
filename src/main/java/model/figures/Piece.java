@@ -34,6 +34,10 @@ public abstract class Piece {
         this.moved = true;
     }
 
+    public void undoMoved() {
+        this.moved = false;
+    }
+
     public void setPosition(Position targetSquare){
         this.position = targetSquare;
     }

@@ -33,15 +33,15 @@ public class King extends Piece {
 
         Position start = this.getPosition();
 
-        int rowDiff = start.yAbsPosDifference(targetSquare);
-        int colDiff = start.xAbsPosDifference(targetSquare);
+        int rowDiff = start.xAbsPosDifference(targetSquare);
+        int colDiff = start.yAbsPosDifference(targetSquare);
 
         if(colDiff == 2 && rowDiff == 0){
-            if(targetSquare.getPosX() == 6){
+            if(targetSquare.getPosY() == 6){
                 return MoveHelper.canCastleKingSide(board, this);
             }
 
-            if(targetSquare.getPosX() == 2){
+            if(targetSquare.getPosY() == 2){
                 return MoveHelper.canCastleQueenSide(board, this);
             }
         }
@@ -78,14 +78,13 @@ public class King extends Piece {
 
     @Override
     public int getValue() {
-        int col = this.getPosition().getPosX();
-        int row = this.getPosition().getPosY();
+        int row = this.getPosition().getPosX();
+        int col = this.getPosition().getPosY();
 
-        if(!this.isWhite()){
+        if(this.isWhite()){
             row = 7 - row;
         }
-        int value = 500 + positionRank[row][col];
-        return this.isWhite() ? value : -value;
+        return 9000 + positionRank[row][col];
     }
 }
 
