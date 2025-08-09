@@ -170,7 +170,7 @@ public class MoveHelper {
             return;
         }
 
-        int row = piece.isWhite() ? 7 : 0;
+        int row = piece.getPosition().getPosX();
         if(MoveResult.CASTLE_KINGSIDE == canCastleKingSide(board, piece)){
             Position castlePosition = new Position(row, 6);
             Move move = new Move(piece.getPosition(), castlePosition, piece, null, true);
@@ -194,6 +194,50 @@ public class MoveHelper {
             move.castleRookPos = rook.getPosition();
             moves.add(move);
         }
+    }
+
+    public void testCastle(Board board, Piece piece, List<Move> moves) {
+        if(piece.getPieceType() != PieceType.KING) return;
+        if(piece.haveMoved()) return;
+        int[] kingSide = {5, 6};
+        int[] queenSide = {1, 2, 3};
+        int row = piece.getPosition().getPosX();
+
+        Piece kingRook = board.getFigureOnSquare(new Position(row, 7));
+        Piece queenRook = board.getFigureOnSquare(new Position(row, 0));
+        if(kingRook == null || kingRook.haveMoved()) return;
+        if(queenRook == null || queenRook.haveMoved()) return;
+
+        boolean canCastleKing = checkMove(board, piece, kingSide, row);
+        boolean canCastleQueen = checkMove(board, piece, queenSide, row);
+
+        Position kingCastlePos = new Position(row, 6);
+        Position queenCastlePos = new Position(row, 2);
+
+        if(canCastleKing) {
+            Move move = new Move(piece.getPosition(), kingCastlePos, piece, null, true);
+            move.castleRook = kingRook;
+            move.castleRookPos = kingRook.getPosition();
+            moves.add(move);
+        }
+
+        if(canCastleQueen) {
+            Move move = new Move(piece.getPosition(), queenCastlePos, piece, null, true);
+            move.castleRook = queenRook;
+            move.castleRookPos = queenRook.getPosition();
+            moves.add(move);
+        }
+    }
+
+    public boolean checkMove(Board board, Piece piece, int[] cols, int row) {
+        for(int col : cols) {
+            Position pos = new Position(row, col);
+            Piece square = board.getFigureOnSquare(pos);
+            if (square != null) return false;
+            if (board.kingInCheck(piece.isWhite())) return false;
+            if (board.checkAfterMove(piece.getPosition(), pos)) return false;
+        }
+        return true;
     }
 
     public static MoveResult canCastleKingSide(Board board, Piece piece){
