@@ -1,7 +1,6 @@
 package model;
 
 import model.figures.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -9,11 +8,9 @@ import java.util.Stack;
 public class Board {
     private final Piece[][] board = new Piece[8][8];
     private final Stack<Move> moves = new Stack<>();
-    private boolean whiteToMove;
 
     public Board(){
         setupBoard();
-        whiteToMove = true;
         System.out.println(getBoardEval());
     }
 
@@ -77,10 +74,6 @@ public class Board {
 
         // Place white king
         board[7][4] = new King(true, new Position(7, 4));
-    }
-
-    public void changeTurns(){
-        whiteToMove = !whiteToMove;
     }
 
     public Piece[][] getBoard(){
@@ -370,5 +363,4 @@ public class Board {
         }
         board[posX][posY] = newPiece;
     }
-
 }

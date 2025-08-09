@@ -3,8 +3,8 @@ package model;
 import model.figures.Piece;
 
 public class Move {
-    public final Position from;
-    public final Position to;
+    public Position from;
+    public Position to;
     public final Piece movedPiece;
     public final Piece capturedPiece;
     public  Piece promotingPawn;
