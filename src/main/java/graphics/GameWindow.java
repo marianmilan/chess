@@ -3,6 +3,9 @@ package graphics;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Initialize window for the chess app.
+ */
 public class GameWindow extends JFrame {
     public GameWindow(ChessBoard chessBoard){
         setDefaultCloseOperation(EXIT_ON_CLOSE);

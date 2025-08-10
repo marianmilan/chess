@@ -5,12 +5,19 @@ import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Manages loading and displaying chess piece icons.
+ * Stores all icons in memory for quick lookup to avoid repeated file access.
+ * Used by {@link ChessBoard} to render pieces on the board.
+ */
 public class PieceIconManager {
     private final Map<String, ImageIcon> icons;
 
-    public PieceIconManager(){
+    /**
+     * Initialize hash map for quick lookups for displaying icons.
+     */
+    public PieceIconManager() {
        icons = new HashMap<>();
-
        icons.put("white_pawn", new ImageIcon("src/main/resources/white_pawn.png"));
        icons.put("black_pawn", new ImageIcon("src/main/resources/black_pawn.png"));
        icons.put("white_rook", new ImageIcon("src/main/resources/white_rook.png"));
@@ -25,8 +32,13 @@ public class PieceIconManager {
        icons.put("black_king", new ImageIcon("src/main/resources/black_king.png"));
     }
 
-    public void displayIcon(ChessBoard.Square button, Piece piece){
-        if(piece == null){
+    /**
+     * Displays icon for a square with a piece on it otherwise null.
+     * @param button clicked square on a chessboard.
+     * @param piece piece on clicked square.
+     */
+    public void displayIcon(ChessBoard.Square button, Piece piece) {
+        if(piece == null) {
             button.setIcon(null);
             return;
         }

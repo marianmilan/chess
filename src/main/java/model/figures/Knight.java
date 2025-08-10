@@ -10,6 +10,7 @@ import java.util.List;
 
 public class Knight extends Piece {
     private static final int[][] positionRank = {
+            // position values on board (adds or decrease value based on position)
             {-50, -40, -30, -30, -30, -30, -40, -50 },
             {-40, -20,   0,   5,   5,   0, -20, -40 },
             {-30,   5,  10,  15,  15,  10,   5, -30 },
@@ -25,7 +26,7 @@ public class Knight extends Piece {
     }
 
     public MoveResult isValidMove(Board board, Position targetSquare) {
-        if(MoveResult.INVALID == MoveHelper.isWithinBounds(board, this, targetSquare)){
+        if (MoveResult.INVALID == MoveHelper.isWithinBounds(board, this, targetSquare)) {
             return MoveResult.INVALID;
         }
 
@@ -36,14 +37,14 @@ public class Knight extends Piece {
 
         boolean isLShapedMove= (rowDiff == 1 && colDiff == 2) || (rowDiff == 2 && colDiff ==1);
 
-        if(MoveResult.VALID == MoveHelper.isValidTarget(board, this, targetSquare) && isLShapedMove){
+        if(MoveResult.VALID == MoveHelper.isValidTarget(board, this, targetSquare) && isLShapedMove) {
             return MoveResult.VALID;
         }
         return MoveResult.INVALID;
     }
 
     @Override
-    public List<Move> getPossibleMoves(Board board){
+    public List<Move> getPossibleMoves(Board board) {
         List<Move> moves = new ArrayList<>();
 
         int currentPosX = this.getPosition().getPosX();
@@ -58,20 +59,20 @@ public class Knight extends Piece {
         Position seven = new Position(currentPosX + 2, currentPosY - 1);
         Position eight = new Position(currentPosX + 2, currentPosY + 1);
 
-        moves.add(new Move(this.getPosition(), one,this, board.getFigureOnSquare(one), false));
-        moves.add(new Move(this.getPosition(), two,this, board.getFigureOnSquare(two), false));
-        moves.add(new Move(this.getPosition(), three,this, board.getFigureOnSquare(three), false));
-        moves.add(new Move(this.getPosition(), four,this, board.getFigureOnSquare(four), false));
-        moves.add(new Move(this.getPosition(), five,this, board.getFigureOnSquare(five), false));
-        moves.add(new Move(this.getPosition(), six,this, board.getFigureOnSquare(six), false));
-        moves.add(new Move(this.getPosition(), seven,this, board.getFigureOnSquare(seven), false));
-        moves.add(new Move(this.getPosition(), eight,this, board.getFigureOnSquare(eight), false));
+        moves.add(new Move(this.getPosition(), one,this, board.getFigureOnSquare(one)));
+        moves.add(new Move(this.getPosition(), two,this, board.getFigureOnSquare(two)));
+        moves.add(new Move(this.getPosition(), three,this, board.getFigureOnSquare(three)));
+        moves.add(new Move(this.getPosition(), four,this, board.getFigureOnSquare(four)));
+        moves.add(new Move(this.getPosition(), five,this, board.getFigureOnSquare(five)));
+        moves.add(new Move(this.getPosition(), six,this, board.getFigureOnSquare(six)));
+        moves.add(new Move(this.getPosition(), seven,this, board.getFigureOnSquare(seven)));
+        moves.add(new Move(this.getPosition(), eight,this, board.getFigureOnSquare(eight)));
 
         return MoveHelper.filterMoves(board, this, moves);
     }
 
     @Override
-    public PieceType getPieceType(){
+    public PieceType getPieceType() {
         return PieceType.KNIGHT;
     }
 

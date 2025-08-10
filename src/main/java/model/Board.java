@@ -5,16 +5,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+/**
+ * Board class that represents chess board.
+ * Maintains the position of all pieces on the board, manages game logic,
+ * including move validation, tracking moves and determining end conditions.
+ * It stores moves in stack so that ai can make and undo moves.
+ *
+ */
 public class Board {
     private final Piece[][] board = new Piece[8][8];
     private final Stack<Move> moves = new Stack<>();
 
-    public Board(){
+    /**
+     * Constructor that set up board.
+     * Place pieces on their starting positions.
+     */
+    public Board() {
         setupBoard();
-        System.out.println(getBoardEval());
     }
 
-    private void setupBoard(){
+    private void setupBoard() {
         placePawns();
         placeRooks();
         placeKnights();
@@ -23,14 +33,14 @@ public class Board {
         placeKings();
     }
 
-    private void placePawns(){
-        for(int i = 0; i < 8; i++){
+    private void placePawns() {
+        for (int i = 0; i < 8; i++) {
             board[6][i] = new Pawn(true, new Position(6, i));
             board[1][i] = new Pawn(false, new Position(1, i));
         }
     }
 
-    private void placeRooks(){
+    private void placeRooks() {
         // Place black rooks
         board[0][0] = new Rook(false, new Position(0,0));
         board[0][7] = new Rook(false, new Position(0, 7));
@@ -40,7 +50,7 @@ public class Board {
         board[7][7] = new Rook(true, new Position(7, 7));
     }
 
-    private void placeKnights(){
+    private void placeKnights() {
         // Place black knights
         board[0][1] = new Knight(false, new Position(0,1));
         board[0][6] = new Knight(false, new Position(0, 6));
@@ -50,7 +60,7 @@ public class Board {
         board[7][6] = new Knight(true, new Position(7, 6));
     }
 
-    private void placeBishops(){
+    private void placeBishops() {
         // Place black bishops
         board[0][2] = new Bishop(false, new Position(0, 2));
         board[0][5] = new Bishop(false, new Position(0, 5));
@@ -60,7 +70,7 @@ public class Board {
         board[7][5] = new Bishop(true, new Position(7, 5));
     }
 
-    private void placeQueens(){
+    private void placeQueens() {
         // Place black queen
         board[0][3] = new Queen(false, new Position(0, 3));
 
@@ -68,7 +78,7 @@ public class Board {
         board[7][3] = new Queen(true, new Position(7, 3));
     }
 
-    private void placeKings(){
+    private void placeKings() {
         // Place black king
         board[0][4] = new King(false, new Position(0, 4));
 
@@ -76,19 +86,34 @@ public class Board {
         board[7][4] = new King(true, new Position(7, 4));
     }
 
-    public Piece[][] getBoard(){
+    public Piece[][] getBoard() {
         return board;
     }
 
+    /**
+     * Return the piece located on the specified position on board.
+     *
+     * @param position position on board
+     * @return Piece or null if the square is empty
+     */
     public Piece getFigureOnSquare(Position position) {
-        if(position.getPosX() > 7 || position.getPosX() < 0 || position.getPosY() > 7 || position.getPosY() < 0){
+        if (position.getPosX() > 7 || position.getPosX() < 0 || position.getPosY() > 7 || position.getPosY() < 0) {
             return null;
         } else {
             return board[position.getPosX()][position.getPosY()];
         }
     }
 
-    public MoveResult movePiece(Position start, Position targetSquare, boolean whiteTurn){
+    /**
+     * Moves a piece on the board from start position to target position,
+     * updating piece information and handling move conditions such as castling and pawn promotion.
+     *
+     * @param start starting square
+     * @param targetSquare ending square
+     * @param whiteTurn white to move
+     * @return MoveResult based on conditions
+     */
+    public MoveResult movePiece(Position start, Position targetSquare, boolean whiteTurn) {
         Piece piece = getFigureOnSquare(start);
 
         if(piece == null || piece.isWhite() != whiteTurn || MoveResult.INVALID == piece.isValidMove(this, targetSquare)) {
@@ -146,32 +171,45 @@ public class Board {
         return MoveResult.INVALID;
     }
 
-    public boolean checkAfterMove(Position start, Position targetSquare){
-        try {
-            Piece piece = getFigureOnSquare(start);
-            Piece capturedPiece = getFigureOnSquare(targetSquare);
+    /**
+     * Check whether the king of the moving piece's color would be in check
+     * after moving piece from the start to the target position.
+     * This method temporarily makes the move, checks for check,
+     * reverts the move and return boolean value.
+     *
+     * @param start starting square
+     * @param targetSquare ending square
+     * @return true if king is in check after move, false otherwise
+     */
+    public boolean checkAfterMove(Position start, Position targetSquare) {
+        Piece piece = getFigureOnSquare(start);
+        Piece capturedPiece = getFigureOnSquare(targetSquare);
 
-            board[start.getPosX()][start.getPosY()] = null;
-            board[targetSquare.getPosX()][targetSquare.getPosY()] = piece;
-            piece.setPosition(targetSquare);
+        board[start.getPosX()][start.getPosY()] = null;
+        board[targetSquare.getPosX()][targetSquare.getPosY()] = piece;
+        piece.setPosition(targetSquare);
 
-            boolean isInCheck = kingInCheck(piece.isWhite());
+        boolean isInCheck = kingInCheck(piece.isWhite());
 
-            board[start.getPosX()][start.getPosY()] = piece;
-            board[targetSquare.getPosX()][targetSquare.getPosY()] = capturedPiece;
-            piece.setPosition(start);
+        board[start.getPosX()][start.getPosY()] = piece;
+        board[targetSquare.getPosX()][targetSquare.getPosY()] = capturedPiece;
+        piece.setPosition(start);
 
-            return isInCheck;
-        } catch (Exception e) {
-            throw new RuntimeException(start + " " + targetSquare);
-        }
+        return isInCheck;
     }
 
-    public Position findKingPosition(boolean isWhite){
-        for (int i = 0; i < 8; i++){
+    /**
+     * Loop through the board to find king position of provided color.
+     * Throws RuntimeException if the king is not found.
+     *
+     * @param isWhite color of king, true = white, false = black
+     * @return Position of king
+     */
+    public Position findKingPosition(boolean isWhite) {
+        for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Piece piece = getFigureOnSquare(new Position(i, j));
-                if(piece != null && piece.getPieceType() == PieceType.KING && piece.isWhite() == isWhite){
+                if (piece != null && piece.getPieceType() == PieceType.KING && piece.isWhite() == isWhite) {
                     return new Position(i, j);
                 }
             }
@@ -179,13 +217,22 @@ public class Board {
         throw new RuntimeException("King not found which should never happen.");
     }
 
-    public boolean kingInCheck(boolean isWhite){
+    /**
+     * Checks if the king of the specified color is in check.
+     * Loops through all pieces on the board of the opposite color and returns true
+     * if any can legally move to the king's position.
+     *
+     * @param isWhite color of piece
+     * @return true if king is in check, false otherwise
+     */
+    public boolean kingInCheck(boolean isWhite) {
         Position kingPosition = findKingPosition(isWhite);
 
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j < 8; j++){
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
                 Piece piece = getFigureOnSquare(new Position(i, j));
-                if(piece != null && piece.isWhite() != isWhite && MoveResult.VALID == piece.isValidMove(this, kingPosition)) {
+                if (piece != null && piece.isWhite() != isWhite
+                        && MoveResult.VALID == piece.isValidMove(this, kingPosition)) {
                     return true;
                 }
             }
@@ -193,15 +240,23 @@ public class Board {
        return false;
     }
 
-    public boolean checkMate(boolean isWhite){
-        if(!kingInCheck(isWhite)){
+    /**
+     * If the king of provided color is in check loop over all the pieces
+     * and check if there is possible moves that can block the check, or if king can escape.
+     * If not returns false.
+     *
+     * @param isWhite color of piece
+     * @return true if checkmate occurs, false otherwise
+     */
+    public boolean checkMate(boolean isWhite) {
+        if (!kingInCheck(isWhite)) {
             return false;
         }
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Piece piece = getFigureOnSquare(new Position(i, j));
-                if(piece != null && piece.isWhite() == isWhite && !piece.getPossibleMoves(this).isEmpty()){
+                if (piece != null && piece.isWhite() == isWhite && !piece.getPossibleMoves(this).isEmpty()) {
                     return false;
                 }
             }
@@ -209,6 +264,13 @@ public class Board {
        return true;
     }
 
+    /**
+     * If the king of provided color is not in check, loop through all the pieces
+     * of this color and if there are no possible moves return true, otherwise false.
+     *
+     * @param isWhite color of piece
+     * @return true if stalemate occurs, false otherwise
+     */
     public boolean staleMate(boolean isWhite){
         if(kingInCheck(isWhite)){
            return false;
@@ -226,10 +288,24 @@ public class Board {
 
     }
 
+    /**
+     * Check if checkmate or stalemate occurs,
+     * this is used as a condition for ai minimax.
+     *
+     * @param isWhite color of piece
+     * @return true if checkmate or stalemate occurs, otherwise false
+     */
     public boolean gameOver(boolean isWhite) {
         return checkMate(isWhite) || staleMate(isWhite);
     }
 
+    /**
+     * Loop through all the pieces of specified colors
+     * and add them together. Returns value of all pieces of this color.
+     *
+     * @param isWhite color of piece
+     * @return value of pieces
+     */
     public int evalPieces(boolean isWhite){
         int eval = 0;
         for(int i = 0; i < 8; i++){
@@ -243,6 +319,13 @@ public class Board {
         return eval;
     }
 
+    /**
+     * Evaluates the board position by calculating the total material value
+     * then returning the difference from black's perspective.
+     * Calculated as (black total value) - (white total value)
+     *
+     * @return value of board
+     */
     public int getBoardEval() {
         int whitePieces = evalPieces(true);
         int blackPieces = evalPieces(false);
@@ -250,6 +333,19 @@ public class Board {
         return blackPieces - whitePieces;
     }
 
+
+    /**
+     * Executes the move on board, updating piece positions, handling special moves,
+     * and adding the move to the stack.
+     * Prevents moves that would leave the moving side's king in check.
+     * Prevents moves directly on king's square.
+     * Updates the piece's has moved status.
+     * Handles pawn promotion
+     * Handles castling moves
+     * Update the board state.
+     *
+     * @param move move to be performed
+     */
     public void makeMove(Move move){
         if(checkAfterMove(move.from, move.to)) return;
         if(move.to.equals(findKingPosition(!move.movedPiece.isWhite()))) return;
@@ -283,7 +379,6 @@ public class Board {
 
             move.movedPiece.setPosition(move.to);
             move.castleRook.setPosition(new Position(rookX, newRookY));
-
             move.castleRook.setMoved();
 
             moves.push(move);
@@ -296,6 +391,9 @@ public class Board {
         moves.push(move);
     }
 
+    /**
+     * Get the last performed move and restore the board according to it.
+     */
     public void undoMove() {
         Move move = moves.pop();
         int fromX = move.from.getPosX();
@@ -338,6 +436,12 @@ public class Board {
         move.movedPiece.setPosition(move.from);
     }
 
+    /**
+     * Return all possible moves by all pieces of provided color.
+     *
+     * @param isWhite piece color
+     * @return List of moves
+     */
     public List<Move> getAllPossibleMoves(boolean isWhite){
         List<Move> moves = new ArrayList<>();
         for(int i = 0; i < 8; i++){
@@ -351,6 +455,13 @@ public class Board {
         return moves;
     }
 
+    /**
+     * Handles promotion and updates board accordingly.
+     * @param type piece type to be promoted to
+     * @param white color of piece
+     * @param posX row position
+     * @param posY col position
+     */
     public void promotion(PieceType type, boolean white, int posX, int posY){
         Piece newPiece;
         Position position = new Position(posX, posY);

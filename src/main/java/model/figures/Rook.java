@@ -10,6 +10,7 @@ import java.util.List;
 
 public class Rook extends Piece {
     public static final int[][] positionRank = {
+            // position values on board (adds or decrease value based on position)
             {  0,   0,   0,   5,   5,   0,   0,   0 },
             { -5,   0,   0,   0,   0,   0,   0,  -5 },
             { -5,   0,   0,   0,   0,   0,   0,  -5 },
@@ -20,14 +21,14 @@ public class Rook extends Piece {
             {  0,   0,   0,   0,   0,   0,   0,   0 }
     };
 
-    public Rook(boolean white, Position position){
+    public Rook(boolean white, Position position) {
         super(white, position);
     }
 
     @Override
     public MoveResult isValidMove(Board board, Position targetSquare) {
 
-        if(MoveResult.INVALID == MoveHelper.isWithinBounds(board, this, targetSquare)){
+        if (MoveResult.INVALID == MoveHelper.isWithinBounds(board, this, targetSquare)) {
             return MoveResult.INVALID;
         }
 
@@ -35,14 +36,14 @@ public class Rook extends Piece {
     }
 
     @Override
-    public List<Move> getPossibleMoves(Board board){
+    public List<Move> getPossibleMoves(Board board) {
         List<Move> moves = new ArrayList<>();
         MoveHelper.getStraightMoves(board, this, moves, 8);
         return MoveHelper.filterMoves(board, this, moves);
     }
 
     @Override
-    public PieceType getPieceType(){
+    public PieceType getPieceType() {
         return PieceType.ROOK;
     }
 
@@ -51,7 +52,7 @@ public class Rook extends Piece {
         int row = this.getPosition().getPosX();
         int col = this.getPosition().getPosY();
 
-        if(this.isWhite()){
+        if (this.isWhite()) {
             row = 7 - row;
         }
         return 500 + positionRank[row][col];

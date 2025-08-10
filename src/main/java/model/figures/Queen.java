@@ -9,6 +9,7 @@ import java.util.List;
 
 public class Queen extends Piece {
     public static final int[][] positionRank = {
+            // position values on board (adds or decrease value based on position)
             {-20, -10, -10,  -5,  -5, -10, -10, -20 },
             {-10,   0,   0,   0,   0,   0,   0, -10 },
             {-10,   0,   5,   5,   5,   5,   0, -10 },
@@ -19,24 +20,25 @@ public class Queen extends Piece {
             {-20, -10, -10,  -5,  -5, -10, -10, -20 }
     };
 
-    public Queen(boolean white, Position position){
+    public Queen(boolean white, Position position) {
         super(white, position);
     }
 
     @Override
     public MoveResult isValidMove(Board board, Position targetSquare) {
-        if(MoveResult.INVALID == MoveHelper.isWithinBounds(board, this, targetSquare)){
+        if (MoveResult.INVALID == MoveHelper.isWithinBounds(board, this, targetSquare)) {
             return MoveResult.INVALID;
         }
 
-        if(MoveResult.VALID == MoveHelper.isDiagonalValid(board, this, targetSquare) || MoveResult.VALID == MoveHelper.isStraightValid(board, this, targetSquare)){
+        if (MoveResult.VALID == MoveHelper.isDiagonalValid(board, this, targetSquare)
+                || MoveResult.VALID == MoveHelper.isStraightValid(board, this, targetSquare)) {
             return MoveResult.VALID;
         }
         return MoveResult.INVALID;
     }
 
     @Override
-    public List<Move> getPossibleMoves(Board board){
+    public List<Move> getPossibleMoves(Board board) {
         List<Move> moves = new ArrayList<>();
         MoveHelper.getDiagonalMoves(board, this, moves, 8);
         MoveHelper.getStraightMoves(board, this, moves, 8);
@@ -44,7 +46,7 @@ public class Queen extends Piece {
     }
 
     @Override
-    public PieceType getPieceType(){
+    public PieceType getPieceType() {
         return PieceType.QUEEN;
     }
 
@@ -53,7 +55,7 @@ public class Queen extends Piece {
         int row = this.getPosition().getPosX();
         int col = this.getPosition().getPosY();
 
-        if(this.isWhite()){
+        if (this.isWhite()) {
             row = 7 - row;
         }
         return 900 + positionRank[row][col];
